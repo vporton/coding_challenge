@@ -17,7 +17,7 @@ pip install -r requirements.txt
 
 ## Running the code
 
-### Spin up the Service
+### Spin up the service
 
 ```
 # start up local server
