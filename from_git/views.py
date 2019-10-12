@@ -10,7 +10,7 @@ class GitAggregator(views.APIView):
         try:
             data = {}  # aggregate_data(profiles)
         except requests.exceptions.RequestException as e:
-            # As code complicates, need to create a special class for error responses.
+            # As the API complicates, should to create a special class for error responses.
             # I did this in the main Turing challenge.
             return Response({'error': 'ERR1', 'message': str(e)})
         else:
