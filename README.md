@@ -99,4 +99,8 @@ and ignore this repo in the statistics.
 
 If GitHub or BitBucket does not respond OK at least once, we
 return an error response, because otherwise the statistics would
-be wrong.
+be wrong. Should have to retry if the possible number of queried
+repos would be big, but this is not implemented.
+
+Data is returned in "data" subobject to be differentiated from
+errors.
