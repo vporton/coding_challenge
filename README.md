@@ -78,6 +78,8 @@ In the output the keywords are sorted to make requests
 deterministic. This may also improve caching, what is however
 currently unimportant because our responses are small.
 
+The main Django app of the project is from_git,
+
 ## Other notes
 
 I would make this repository private but in an non-understandable
