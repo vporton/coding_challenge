@@ -1,6 +1,7 @@
 # Coding Challenge App
 
-A Django app for a solution to a coding challenge.
+A Django app for a solution to a:
+[coding challenge](https://drive.google.com/file/d/0B6y8e6-LG84naElFcTlkcHQ1bU1qUkM1Y2VhbXpMdnE4ZjJz/view).
 
 ## Install:
 
