@@ -20,10 +20,15 @@ pip install -r requirements.txt
 
 ## Running the code
 
-First you need to run once to create the DB:
+First you need to run once to create the DB (by default it is
+SQLite):
 ```
 python manage.py migrate
 ```
+
+Probably all Django database drivers are supported.
+
+TODO: local_settings.py
 
 ### Spin up the service
 
