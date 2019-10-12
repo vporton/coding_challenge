@@ -20,10 +20,14 @@ pip install -r requirements.txt
 
 ## Running the code
 
-TODO
+First you need to run once to create the DB:
+```
+python manage.py migrate
+```
 
 ### Spin up the service
 
+Then you can start the project in debug mode by
 ```
 # start up local server
 python manage.py runserver 
