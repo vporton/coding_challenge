@@ -28,6 +28,11 @@ python manage.py migrate
 
 Probably all Django database drivers are supported.
 
+Moreover, probably it will work without creating the DB as it is
+not used in my code, but for greater reliability I advise to
+create the DB, because the Django workflow requires it. You could
+reconfigure it to hold the SQLite file in /tmp/.
+
 TODO: local_settings.py
 
 ### Spin up the service
@@ -62,7 +67,8 @@ complex.
 DRF takes very little CPU resources and more importantly some
 memory and startup time.
 
-Requests are done through GET to conform to REST. If the number
+Requests are done through GET to conform to REST. (It should be GET
+because does not change the server state.) If the number
 of organizations is big, the GET request would have a very long
 URL and not work on very old browsers. It is very easy to change
 the code to use POST (or even support both GET and POST).  
