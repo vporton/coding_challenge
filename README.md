@@ -76,9 +76,11 @@ the code to use POST (or even support both GET and POST).
 My code ideally should be multithreaded or asynchronous to handle
 several GH/BB requests in parallel, but that would take too much
 time to implement. Otherwise it is near to be most efficient
-possible for a DRF project. It could be improved a little by
-"summing" data from several requests at once rather than by pairs
-but that improvement would be minor.
+possible for a DRF project (however see code comments). It could be
+improved a little by "summing" data from several requests at once
+rather than by pairs but that improvement would be minor. (It is
+minor, I note it only because I was specifically asked about
+efficiency.)
 
 In the output the keywords are sorted to make requests
 deterministic. This may also improve caching, what is however
@@ -104,3 +106,16 @@ repos would be big, but this is not implemented (TODO).
 
 Data is returned in "data" subobject to be differentiated from
 errors.
+
+Should have used GraphQL GitHub API (v4) to reduce the transfered
+data amount, but sadly I do not yet know GraphQL and this is a
+quick project. If I'd worked on a serious project, I'd first
+study GraphQL.
+
+TODO: ETag and date
+
+TODO: Check if a profile in request provided more than once. 
+
+TODO: github3.py and otherwise caching.
+
+TODO: handling gh/bb errors.

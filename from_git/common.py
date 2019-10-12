@@ -8,9 +8,9 @@
 #     'forkedRepos': NUM,
 #     'watchers': NUM,
 #     'followers': NUM,
-#     'langsNum': NUM,
+#     'langsNum': NUM,  # may be missing
 #     'langs': set(...),
-#     'topicsNum': NUM,
+#     'topicsNum': NUM,  # may be missing
 #     'topics': set(...),
 # }
 
@@ -26,8 +26,10 @@ zero_data = {
     'topics': set(),
 }
 
-# Make a "sum" of two profiles:
 def sum_profiles(a, b):
+    """Make a "sum" of two profiles.
+
+    Could be `__add__()` operator instead but that would need a special class what is more complication than a benefit."""
     return {
         'originalRepos': a.originalRepos + b.originalRepos,
         'forkedRepos': a.forkedRepos + b.forkedRepos,

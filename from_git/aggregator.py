@@ -26,4 +26,6 @@ def aggregate_data(profiles):
     s = reduce(sum_profiles, arr, zero_data)  # "Sum" several profiles together
     s['langs'] = list(sorted(s['langs']))  # Transform the set into a list.
     s['topics'] = list(sorted(s['topics']))  # Transform the set into a list.
+    s['langsNum'] = len(s['langs'])
+    s['topicsNum'] = len(s['topics'])
     return s
