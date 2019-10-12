@@ -3,9 +3,13 @@
 
 from copy import deepcopy
 
+from github3.repos import Repository
+
 from from_git.common import zero_data
 
 
 def download_organization(url):
+    repo_name = url.replace('https://bitbucket.org/', '', 1)
+    repositories = Repository.all(repo_name)
     result = deepcopy(zero_data)
     return result

@@ -31,7 +31,8 @@ def process_repository(repo):
             result['originalRepos'] = 1
     result['watchers'] = repo.subscribers_count
     result['followers'] = repo.stargazers_count
-    result['langs'] = {repo.language}  # somehow ineffient
+    if not repo.private:
+        result['langs'] = {repo.language}  # somehow ineffient
     result['topics'] = set(repo.topics())
 
     return result
@@ -40,7 +41,7 @@ def process_repository(repo):
 def download_organization(url):
     result = deepcopy(zero_data)  # still zero repos processed
     global etag
-    i = github.repositories_by(url.replace('https://bitbucket.org/', '', 1), etag=etag)
+    i = github.repositories_by(url.replace('https://github.com/', '', 1), etag=etag)
     for short_repository in i:
         etag = i.etag  # store
         # full_repository = short_repository.refresh()
