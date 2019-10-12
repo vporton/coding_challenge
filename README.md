@@ -92,3 +92,11 @@ I would make this repository private but in an non-understandable
 reason GitHub does not allow private forks of public repositories.
 I noticed other users made public forks too, so I am not the only
 "insider".
+
+In the case if a repository is missing, we return it in the list
+of missing repositories (check if it is empty to ensure not errors)
+and ignore this repo in the statistics.
+
+If GitHub or BitBucket does not respond OK at least once, we
+return an error response, because otherwise the statistics would
+be wrong.
