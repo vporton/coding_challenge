@@ -9,8 +9,8 @@ TODO
 
 You can use a virtual environment created by virtualenv:
 ```
-conda env create -f environment.yml
-source activate user-profiles
+virtualenv -p python3 ~/.virtualenv/coding_challenge-porton
+source ~/.virtualenv/coding_challenge-porton/bin/activate
 ```
 
 Or just pip install from the requirements file
@@ -64,6 +64,10 @@ time to implement. Otherwise it is near to be most efficient
 possible for a DRF project. It could be improved a little by
 "summing" data from several requests at once rather than by pairs
 but that improvement would be minor.
+
+In the output the keywords are sorted to make requests
+deterministic. This may also improve caching, what is however
+currently unimportant because our responses are small.
 
 ## Other notes
 
