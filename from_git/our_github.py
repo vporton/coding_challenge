@@ -1,8 +1,6 @@
-# We have a choice of agithub (maybe, too general purpose), octohub (low level), github3.py
-# (claims to be convenient and ergonomic).
-# We should have use instead github-api-v4 to support more efficient GraphQL queries,
-# but that project is still in planning stage.
-# So our choice is github3.py.
+# We have a choice of python-bitbucket and atlassian-python-api.
+# I chose the least general library as probably faster and better
+# suited for our rather specialized task.
 
 from copy import deepcopy
 
@@ -31,7 +29,7 @@ def process_repository(repo):
             result['originalRepos'] = 1
     result['watchers'] = repo.subscribers_count
     result['followers'] = repo.stargazers_count
-    if not repo.private:
+    if not repo.private and repo.language:
         result['langs'] = {repo.language}  # somehow ineffient
     result['topics'] = set(repo.topics())
 
@@ -40,10 +38,10 @@ def process_repository(repo):
 
 def download_organization(url):
     result = deepcopy(zero_data)  # still zero repos processed
-    global etag
+    repo_name = url.replace('https://github.com/', '', 1)
     i = github.repositories_by(url.replace('https://github.com/', '', 1), etag=etag)
     for short_repository in i:
         etag = i.etag  # store
         # full_repository = short_repository.refresh()
-        result = sum_profiles(result, short_repository)
+        result = sum_profiles(result, process_repository(short_repository))
     return result

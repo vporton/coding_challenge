@@ -99,6 +99,8 @@ In the case if a repository is missing, we return it in the list
 of missing repositories (check if it is empty to ensure not errors)
 and ignore this repo in the statistics.
 
+Followers and topics are missing on BitBucket, so I return zero for them.
+
 If GitHub or BitBucket does not respond OK at least once, we
 return an error response, because otherwise the statistics would
 be wrong. Should have to retry if the possible number of queried
