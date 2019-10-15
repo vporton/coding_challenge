@@ -32,9 +32,9 @@ def process_repository(repo):
             result['originalRepos'] = 1
     result['watchers'] = repo['watchers']['totalCount']
     result['followers'] = repo['stargazers']['totalCount']
-    if not repo['isPrivate'] and repo['primaryLanguage']:
-        result['langs'] = {repo['primaryLanguage']}  # somehow ineffient
-    result['topics'] = set(t['nodes']['topic']['name'] for t in repo['repositoryTopics']['nodes'])
+    if not repo['isPrivate']:
+        result['langs'] = set(t['name'] for t in repo['languages']['nodes'])
+    result['topics'] = set(t['topic']['name'] for t in repo['repositoryTopics']['nodes'])
 
     return result
 
@@ -48,30 +48,34 @@ def get_repositories_for_org(client, org):
         j = client.execute('''
         {
             search(query: "%s", type: REPOSITORY, first: %d%s) {
-                edges { node {
-                    ... on Repository {
-                        isPrivate
-                        parent {
-                            id
-                        }
-                        watchers {
-                            totalCount
-                        }
-                        stargazers {
-                            totalCount
-                        }
-                        primaryLanguage { # FIXME: several
-                            name
-                        }
-                        repositoryTopics(first: 100) { # exprimentally found max valu that works
-                            nodes {
-                                topic {
+                edges {
+                    node {
+                        ... on Repository {
+                            isPrivate
+                            parent {
+                                id
+                            }
+                            watchers {
+                                totalCount
+                            }
+                            stargazers {
+                                totalCount
+                            }
+                            languages(first: 100) { # exprimentally found max value that works
+                                nodes {
                                     name
+                                }
+                            }
+                            repositoryTopics(first: 100) { # exprimentally found max value that works
+                                nodes {
+                                    topic {
+                                        name
+                                    }
                                 }
                             }
                         }
                     }
-                } }
+                }
                 pageInfo {
                     hasNextPage
                     endCursor
