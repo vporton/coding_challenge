@@ -5,6 +5,7 @@ import json
 from copy import deepcopy
 
 import github3
+from django.conf import settings
 from graphqlclient import GraphQLClient
 
 from from_git.common import zero_data, sum_profiles
@@ -41,24 +42,26 @@ def download_organization(url):
     result = deepcopy(zero_data)  # still zero repos processed
     org = url.replace('https://github.com/', '', 1)
     client = GraphQLClient('https://api.github.com/graphql')
-    client.inject_token('Bearer 5c6fc39a80bf5780f4683bf6685b6b6b2e502d67')  # TODO: Don't hardcode
+    client.inject_token('Bearer ' + settings.GITHUB_API_TOKEN)  # TODO: Don't hardcode
     # FIXME: quoting the org name
     j = client.execute('''
 {
     search(query: "%s", type: REPOSITORY) {
-        isPrivate
-        parent
-        watchers {
-            totalCount
-        }
-        stargazers {
-            totalCount
-        }
-        primaryLanguage
-        repositoryTopics {
-            nodes {
-                topic {
-                    name
+        nodes {
+            isPrivate
+            parent
+            watchers {
+                totalCount
+            }
+            stargazers {
+                totalCount
+            }
+            primaryLanguage
+            repositoryTopics {
+                nodes {
+                    topic {
+                        name
+                    }
                 }
             }
         }
