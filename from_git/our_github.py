@@ -38,9 +38,9 @@ def process_repository(repo):
 
 def download_organization(url):
     result = deepcopy(zero_data)  # still zero repos processed
-    repo_name = url.replace('https://github.com/', '', 1)
+    org = url.replace('https://github.com/', '', 1)
     global etag
-    i = github.repositories_by(repo_name, etag=etag)
+    i = github.repositories_by(org, etag=etag)
     for short_repository in i:
         etag = i.etag  # store
         # full_repository = short_repository.refresh()

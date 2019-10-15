@@ -2,4 +2,3 @@ Django==2.2.6
 djangorestframework==3.9.3
 requests==2.22.0
 github3.py==1.0.2
-git+ssh://git@bitbucket.org/atlassian/python-bitbucket@v0.12.0

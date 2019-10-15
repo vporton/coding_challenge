@@ -1,13 +1,30 @@
 # We have a choice of python-bitbucket and atlassian-python-api. (Later found also fifbucket.)
-# I choose python-
-# But it's incompatible with uitemplate 0.6 used by github.py. So do it manually.
+# python-bitbucket is incompatible with uitemplate 0.6 used by github.py.
 
 from copy import deepcopy
 
 import requests
-from pybitbucket.team import Team
 
 from from_git.common import zero_data, sum_profiles
+
+
+# Based on https://community.atlassian.com/t5/Bitbucket-discussions/How-to-list-all-repositories-of-a-team-through-Bitbucket-REST/td-p/1142643
+def list_team_repos(team):
+    # Request 100 repositories per page (and only their slugs), and the next page URL
+    next_page_url = 'https://api.bitbucket.org/2.0/repositories/%s?pagelen=100&fields=next,values.slug' % team
+
+    # Keep fetching pages while there's a page to fetch
+    while next_page_url is not None:
+        response = requests.get(next_page_url)
+        page_json = response.json()
+
+        # Parse repositories from the JSON
+        for repo in page_json['values']:
+            yield repo['slug']
+
+        # Get the next page URL, if present
+        # It will include same query parameters, so no need to append them again
+        next_page_url = page_json.get('next', None)
 
 
 def process_repository(repo):
@@ -35,8 +52,7 @@ def process_repository(repo):
 
 
 def download_organization(url):
-    repo_name = url.replace('https://bitbucket.org/', '', 1)
-    repositories = Team(repo_name)
-    for repo in repositories:
+    team = url.replace('https://bitbucket.org/', '', 1)
+    for repo in list_team_repos(team):
         result = sum_profiles(result, process_repository(repo))
     return result
