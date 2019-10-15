@@ -9,9 +9,9 @@ from from_git.common import zero_data, sum_profiles
 
 
 # Based on https://community.atlassian.com/t5/Bitbucket-discussions/How-to-list-all-repositories-of-a-team-through-Bitbucket-REST/td-p/1142643
-def list_team_repos(team):
+def list_team_repos(team, fields):
     # Request 100 repositories per page (and only their slugs), and the next page URL
-    next_page_url = 'https://api.bitbucket.org/2.0/repositories/%s?pagelen=100&fields=next,values.slug' % team
+    next_page_url = 'https://api.bitbucket.org/2.0/repositories/%s?pagelen=100&fields=next,%s' % (team, fields)
 
     # Keep fetching pages while there's a page to fetch
     while next_page_url is not None:
@@ -36,23 +36,23 @@ def process_repository(repo):
     Code for returning it in a special format can be easily extracted in the future if
     the project grows and we'd need this abstraction."""
     result = deepcopy(zero_data)
-    if not repo.is_private:
-        if hasattr(repo, 'parent'):  # check if forked
-            result['forkedRepos']  = 1
+    if not repo['is_private']:
+        if 'parent' in repo['parent']:  # check if forked
+            result['forkedRepos'] = 1
         else:
             result['originalRepos'] = 1
     # No pybitbucket wrapper, do ourselves:
-    watchers_response = requests.get(repo.links.watchers.href + '?pagelen=0')  # don't retrieve the items, only size
+    watchers_response = requests.get(repo['links']['watchers']['href'] + '?pagelen=0')  # don't retrieve the items, only size
     result['watchers'] = watchers_response.json()['size']
     # result['followers'] = 0  # No followers concept in BitBucket.
-    if not repo.is_private and repo.language:
-        result['langs'] = {repo.language}  # somehow ineffient
+    if not repo['is_private'] and repo['language']:
+        result['langs'] = {repo['language']}  # somehow ineffient
     # result['topics'] = set()  # No topics concept in BitBucket
     return result
 
 
 def download_organization(url):
     team = url.replace('https://bitbucket.org/', '', 1)
-    for repo in list_team_repos(team):
+    for repo in list_team_repos(team, 'values.is_private,values.parent,values.links.watchers.href,values.language'):
         result = sum_profiles(result, process_repository(repo))
     return result
