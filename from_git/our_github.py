@@ -1,7 +1,7 @@
 # We have a choice of python-bitbucket and atlassian-python-api.
 # I chose the least general library as probably faster and better
 # suited for our rather specialized task.
-
+import json
 from copy import deepcopy
 
 import github3
@@ -41,9 +41,11 @@ def download_organization(url):
     result = deepcopy(zero_data)  # still zero repos processed
     org = url.replace('https://github.com/', '', 1)
     client = GraphQLClient('https://api.github.com/graphql')
-    json = client.execute('''
+    client.inject_token('Bearer 5c6fc39a80bf5780f4683bf6685b6b6b2e502d67')  # TODO: Don't hardcode
+    # FIXME: quoting the org name
+    j = client.execute('''
 {
-    search(query: $org, type: REPOSITORY) {
+    search(query: "%s", type: REPOSITORY) {
         isPrivate
         parent
         watchers {
@@ -62,7 +64,8 @@ def download_organization(url):
         }
     }
 }
-''', variables={'org': org})
-    for repo in json['repository']:
+''' % org)
+    data = json.loads(j)
+    for repo in data['repository']:
         result = sum_profiles(result, process_repository(repo))
     return result
