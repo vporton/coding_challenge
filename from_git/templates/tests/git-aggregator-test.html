@@ -3,6 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <title>Git aggregator test</title>
+    <script>
+        var onSubmit = function(form) {
+            var urls = document.getElementById('urls').value.split('\n');
+            for (var url in urls) {
+                var hidden = document.createElement('input');
+                hidden.setAttribute('type', 'hidden');
+                hidden.setAttribute('name', 'url')
+                hidden.setAttribute('value', urls[url]);
+                form.appendChild(hidden);
+            }
+        }
+    </script>
 </head>
 <body>
 
@@ -10,11 +22,11 @@
 
 {# I do not use Django forms, because this would be an over-abstraction. #}
 <p>
-    <textarea id="urls"></textarea>
+    <textarea id="urls" style="width: 100%; height: 10ex"></textarea>
 </p>
 
 <form method="get" action="{% url 'health-check' %}"
-      onsubmit="document.getElementById('url').value = document.getElementById('urls').value.split('\n')">
+      onsubmit="onSubmit(this)">
     <input type="submit">
 </form>
 
