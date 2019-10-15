@@ -3,6 +3,7 @@
 # The sum will be returned in the JSON response.
 from functools import reduce
 
+from from_git import our_github, our_bitbucket
 from from_git.common import zero_data, sum_profiles
 
 
@@ -16,9 +17,9 @@ def aggregate_data(profiles):
     arr = []
     for url in profiles:
         if url.startswith("https://github.com/"):
-            arr.append(github.download_organization(url))
+            arr.append(our_github.download_organization(url))
         elif url.startswith("https://bitbucket.org/"):
-            arr.append(bitbucket.download_team(url))
+            arr.append(our_bitbucket.download_team(url))
         else:
             raise WrongURLException("Only GitHub organization and BitBucket team URLs are supported.")
 

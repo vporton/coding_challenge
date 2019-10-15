@@ -1,5 +1,6 @@
 # We have a choice of python-bitbucket and atlassian-python-api. (Later found also fifbucket.)
-# I choose python-bitbucket as more specialized and so probably more efficient and easy to use.
+# I choose python-
+# But it's incompatible with uitemplate 0.6 used by github.py. So do it manually.
 
 from copy import deepcopy
 
