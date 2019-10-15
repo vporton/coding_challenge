@@ -34,7 +34,7 @@ def process_repository(repo):
     result['followers'] = repo['stargazers']['totalCount']
     if not repo['isPrivate'] and repo['primaryLanguage']:
         result['langs'] = {repo['primaryLanguage']}  # somehow ineffient
-    result['topics'] = set(t['nodes']['topic']['name'] in repo['repositoryTopics'])
+    result['topics'] = set(t['nodes']['topic']['name'] for t in repo['repositoryTopics']['nodes'])
 
     return result
 
@@ -93,5 +93,6 @@ def download_organization(url):
     client = GraphQLClient('https://api.github.com/graphql')
     client.inject_token('Bearer ' + settings.GITHUB_API_TOKEN)  # TODO: Don't hardcode
     for repo in get_repositories_for_org(client, org):
-        result = sum_profiles(result, process_repository(repo))
+        pocessed_repo_data = process_repository(repo)
+        result = sum_profiles(result, pocessed_repo_data)
     return result
