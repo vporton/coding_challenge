@@ -1,4 +1,5 @@
 import requests
+from django.shortcuts import render
 from rest_framework import views
 from rest_framework.response import Response
 
@@ -19,3 +20,8 @@ class GitAggregator(views.APIView):
             return Response({'error': 'ERR2', 'message': str(e)})
         else:
             return Response({'error': 'OK', 'data': data})
+
+
+class GitAggregatorTest(views.View):
+    def get(self, request):
+        return render(request, 'tests/git-aggregator-test.html')

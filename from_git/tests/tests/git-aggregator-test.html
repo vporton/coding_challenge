@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Git aggregator test</title>
+</head>
+<body>
+
+<p>Enter one URL per line:</p>
+
+{# I do not use Django forms, because this would be an over-abstraction. #}
+<p>
+    <textarea id="urls"></textarea>
+</p>
+
+<form method="get" action="{% url 'health-check' %}"
+      onsubmit="document.getElementById('url').value = document.getElementById('urls').value.split('\n')">
+    <input type="submit">
+</form>
+
+</body>
+</html>

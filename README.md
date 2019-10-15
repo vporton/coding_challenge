@@ -110,9 +110,8 @@ Data is returned in "data" subobject to be differentiated from
 errors.
 
 Should have used GraphQL GitHub API (v4) to reduce the transfered
-data amount, but sadly I do not yet know GraphQL and this is a
-quick project. If I'd worked on a serious project, I'd first
-study GraphQL.
+data amount, but sadly there is no support of GraphQL in used librarires and this is a
+quick project. If I'd worked on a serious project, I'd use GraphQL.
 
 TODO: ETag and date
 

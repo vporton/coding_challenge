@@ -14,11 +14,12 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 
 import from_git.views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('health-check', from_git.views.GitAggregator.as_view())
+    path('from-git', include(from_git.urls)),
+    path('health-check', from_git.views.GitAggregator.as_view(), name='health-check')
 ]
