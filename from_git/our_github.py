@@ -47,10 +47,11 @@ def get_repositories_for_org(client, org):
         number_of_repos_in_query = 100
         j = client.execute('''
         {
-            search(query: "%s", type: REPOSITORY, first: %d%s) {
+            search(query: "org:%s", type: REPOSITORY, first: %d%s) {
                 edges {
                     node {
                         ... on Repository {
+                            name # FIXME: remove
                             isPrivate
                             parent {
                                 id
