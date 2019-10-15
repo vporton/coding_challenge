@@ -47,10 +47,10 @@ def get_repositories_for_org(client, org):
         number_of_repos_in_query = 100
         j = client.execute('''
         {
-            search(query: "org:%s", type: REPOSITORY, first: %d%s) {
-                edges {
-                    node {
-                        ... on Repository {
+            organization(login: "%s") {
+                repositories(first: %d%s) {
+                    edges {
+                        node {
                             name # FIXME: remove
                             isPrivate
                             parent {
@@ -62,7 +62,7 @@ def get_repositories_for_org(client, org):
                             stargazers {
                                 totalCount
                             }
-                            languages(first: 100) { # exprimentally found max value that works
+                            languages(first: 100) { # exprimentally found max value that works # FIXME
                                 nodes {
                                     name
                                 }
@@ -76,20 +76,20 @@ def get_repositories_for_org(client, org):
                             }
                         }
                     }
-                }
-                pageInfo {
-                    hasNextPage
-                    endCursor
+                    pageInfo {
+                        hasNextPage
+                        endCursor
+                    }
                 }
             }
         }
         ''' % (org, number_of_repos_in_query, after_str))  # hardcoded limit  # FIXME: calculation
         # TODO: Debug pagination
-        data = json.loads(j)['data']['search']
+        data = json.loads(j)['data']['organization']['repositories']
+        yield from data['edges']
         if not data['pageInfo']['hasNextPage']:
             break
         after = data['pageInfo']['endCursor']
-        yield from data['edges']
 
 
 def download_organization(url):
