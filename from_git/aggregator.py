@@ -3,7 +3,6 @@
 # The sum will be returned in the JSON response.
 from functools import reduce
 
-from from_git import github, bitbucket
 from from_git.common import zero_data, sum_profiles
 
 

@@ -15,11 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+import from_git.urls
 
 import from_git.views
 
 urlpatterns = [
     # path('admin/', admin.site.urls),
-    path('from-git', include(from_git.urls)),
+    path('from-git/', include(from_git.urls)),
     path('health-check', from_git.views.GitAggregator.as_view(), name='health-check')
 ]
