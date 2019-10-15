@@ -5,6 +5,7 @@
 from copy import deepcopy
 
 import github3
+from graphqlclient import GraphQLClient
 
 from from_git.common import zero_data, sum_profiles
 
@@ -22,16 +23,16 @@ def process_repository(repo):
     Code for returning it in a special format can be easily extracted in the future if
     the project grows and we'd need this abstraction."""
     result = deepcopy(zero_data)
-    if not repo.private:
-        if 'parent' in repo:  # check if forked
+    if not repo['isPrivate']:
+        if repo['parent']:  # check if forked
             result['forkedRepos'] = 1
         else:
             result['originalRepos'] = 1
-    result['watchers'] = repo.subscribers_count
-    result['followers'] = repo.stargazers_count
-    if not repo.private and repo.language:
-        result['langs'] = {repo.language}  # somehow ineffient
-    result['topics'] = set(repo.topics())
+    result['watchers'] = repo['watchers']['totalCount']
+    result['followers'] = repo['stargazers']['totalCount']
+    if not repo['isPrivate'] and repo['primaryLanguage']:
+        result['langs'] = {repo['primaryLanguage']}  # somehow ineffient
+    result['topics'] = set(t['nodes']['topic']['name'] in repo['repositoryTopics'])
 
     return result
 
@@ -39,10 +40,29 @@ def process_repository(repo):
 def download_organization(url):
     result = deepcopy(zero_data)  # still zero repos processed
     org = url.replace('https://github.com/', '', 1)
-    global etag
-    i = github3.repositories_by(org, etag=etag)
-    for short_repository in i:
-        etag = i.etag  # store
-        # full_repository = short_repository.refresh()
-        result = sum_profiles(result, process_repository(short_repository))
+    client = GraphQLClient('http://graphql-swapi.parseapp.com/')
+    json = client.execute('''
+{
+    search(query: $org, type: REPOSITORY) {
+        isPrivate
+        parent
+        watchers {
+            totalCount
+        }
+        stargazers {
+            totalCount
+        }
+        primaryLanguage
+        repositoryTopics {
+            nodes {
+                topic {
+                    name
+                }
+            }
+        }
+    }
+}
+''', variable_values={'org': org})
+    for repo in json['repository']:
+        result = sum_profiles(result, process_repository(repo))
     return result
