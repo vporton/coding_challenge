@@ -48,19 +48,25 @@ def download_organization(url):
 {
     search(query: "%s", type: REPOSITORY) {
         nodes {
-            isPrivate
-            parent
-            watchers {
-                totalCount
-            }
-            stargazers {
-                totalCount
-            }
-            primaryLanguage
-            repositoryTopics {
-                nodes {
-                    topic {
-                        name
+            ... on Repository {
+                isPrivate
+                parent {
+                    id
+                }
+                watchers {
+                    totalCount
+                }
+                stargazers {
+                    totalCount
+                }
+                primaryLanguage {
+                    name
+                }
+                repositoryTopics {
+                    nodes {
+                        topic {
+                            name
+                        }
                     }
                 }
             }
