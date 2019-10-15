@@ -23,6 +23,7 @@ def process_repository(repo):
     return the "processed" data in the same format as a summary for an entire organization.
     Code for returning it in a special format can be easily extracted in the future if
     the project grows and we'd need this abstraction."""
+    repo = repo['node']
     result = deepcopy(zero_data)
     if not repo['isPrivate']:
         if repo['parent']:  # check if forked
@@ -38,43 +39,59 @@ def process_repository(repo):
     return result
 
 
+def get_repositories_for_org(client, org):
+    after = None
+    while True:
+        # FIXME: quoting
+        after_str = ", after: \"%s\"" % after if after is not None else ""
+        number_of_repos_in_query = 100
+        j = client.execute('''
+        {
+            search(query: "%s", type: REPOSITORY, first: %d%s) {
+                edges { node {
+                    ... on Repository {
+                        isPrivate
+                        parent {
+                            id
+                        }
+                        watchers {
+                            totalCount
+                        }
+                        stargazers {
+                            totalCount
+                        }
+                        primaryLanguage { # FIXME: several
+                            name
+                        }
+                        repositoryTopics(first: 100) { # exprimentally found max valu that works
+                            nodes {
+                                topic {
+                                    name
+                                }
+                            }
+                        }
+                    }
+                } }
+                pageInfo {
+                    hasNextPage
+                    endCursor
+                }
+            }
+        }
+        ''' % (org, number_of_repos_in_query, after_str))  # hardcoded limit  # FIXME: calculation
+        # TODO: Debug pagination
+        data = json.loads(j)['data']['search']
+        if not data['pageInfo']['hasNextPage']:
+            break
+        after = data['pageInfo']['endCursor']
+        yield from data['edges']
+
+
 def download_organization(url):
     result = deepcopy(zero_data)  # still zero repos processed
     org = url.replace('https://github.com/', '', 1)
     client = GraphQLClient('https://api.github.com/graphql')
     client.inject_token('Bearer ' + settings.GITHUB_API_TOKEN)  # TODO: Don't hardcode
-    # FIXME: quoting the org name
-    j = client.execute('''
-{
-    search(query: "%s", type: REPOSITORY) {
-        nodes {
-            ... on Repository {
-                isPrivate
-                parent {
-                    id
-                }
-                watchers {
-                    totalCount
-                }
-                stargazers {
-                    totalCount
-                }
-                primaryLanguage {
-                    name
-                }
-                repositoryTopics {
-                    nodes {
-                        topic {
-                            name
-                        }
-                    }
-                }
-            }
-        }
-    }
-}
-''' % org)
-    data = json.loads(j)
-    for repo in data['repository']:
+    for repo in get_repositories_for_org(client, org):
         result = sum_profiles(result, process_repository(repo))
     return result
