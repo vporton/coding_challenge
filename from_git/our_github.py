@@ -40,7 +40,7 @@ def process_repository(repo):
 def download_organization(url):
     result = deepcopy(zero_data)  # still zero repos processed
     org = url.replace('https://github.com/', '', 1)
-    client = GraphQLClient('http://graphql-swapi.parseapp.com/')
+    client = GraphQLClient('https://api.github.com/graphql')
     json = client.execute('''
 {
     search(query: $org, type: REPOSITORY) {
@@ -62,7 +62,7 @@ def download_organization(url):
         }
     }
 }
-''', variable_values={'org': org})
+''', variables={'org': org})
     for repo in json['repository']:
         result = sum_profiles(result, process_repository(repo))
     return result
