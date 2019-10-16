@@ -2,7 +2,7 @@
 # and "sum" its members together with the __add__() operator.
 # The sum will be returned in the JSON response.
 import multiprocessing.pool
-from multiprocessing import Event
+import threading
 
 from django.conf import settings
 
@@ -28,10 +28,10 @@ class Result(object):
     def __init__(self):
         self.data = zero_data
         self.counter = 0  # counter of threads working to produce this result
-        self.event = Event()
+        self.event = threading.Event()
 
 
-class WorkerPool(multiprocessing.pool.Pool):
+class WorkerPool(multiprocessing.pool.ThreadPool):
     def __init__(self):
         self.lock = multiprocessing.Lock()
         super().__init__(settings.NUM_THREADS)
@@ -40,7 +40,7 @@ class WorkerPool(multiprocessing.pool.Pool):
         result = Result()
         for url in urls:
             result.counter += 1  # do not return until it is zero again
-            self.apply_async(WorkerPool.process_one, self, result, url)
+            self.apply_async(WorkerPool.process_one, (self, result, url))
         # Can acquire only when all calls are finished:
         result.event.wait()
         return result.data
