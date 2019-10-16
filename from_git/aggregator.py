@@ -24,35 +24,37 @@ def aggregate_one(url):
         raise WrongURLException("Only GitHub organization and BitBucket team URLs are supported.")
 
 
-class Result(object):
+class Aggregation(object):
+    """Data in the middle of our aggregation process."""
     def __init__(self):
-        self.data = zero_data
-        self.counter = 0  # counter of threads working to produce this result
-        self.ready = threading.Event()
+        self.data = zero_data  # nothing downloaded yet
+        self.counter = 0  # counter of threads working now to produce this result (NOT the number of workers)
+        self.ready = threading.Event()  # when the aggregation operation finishes
 
 
 class WorkerPool(multiprocessing.pool.ThreadPool):
     """Running multiple network queries in parallel."""
 
     def __init__(self):
-        self.lock = multiprocessing.Lock()
+        self.lock = multiprocessing.Lock()  # against race conditions
         super().__init__(settings.NUM_THREADS)
 
     def run(self, urls):
-        result = Result()
+        """Run our aggregation from multiple GH/BB teams in parallel and return the result."""
+        aggregation = Aggregation()
         for url in urls:
-            result.counter += 1  # do not return until it is zero again
-            self.apply_async(WorkerPool.process_one, (self, result, url))
-        # Can acquire only when all calls are finished:
-        result.ready.wait()
-        return result.data
+            aggregation.counter += 1  # do not return until it is zero again
+            self.apply_async(WorkerPool.process_one, (self, aggregation, url))
+        aggregation.ready.wait()
+        return aggregation.data
 
     @staticmethod
     def process_one(self, result, url):
+        """Aggregate one organization/team into our aggregation data."""
         result_for_one_team = aggregate_one(url)
-        with self.lock:
+        with self.lock:  # avoid race conditions
             result.data = sum_profiles(result.data, result_for_one_team)
-            result.counter -= 1
+            result.counter -= 1  # this thread is ready
             if not result.counter:
                 result.ready.set()  # Notify that we have finished with this result object,
 
