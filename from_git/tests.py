@@ -1,7 +1,36 @@
 from django.test import TestCase
 
 from from_git.aggregator import aggregate_one, WrongURLException, aggregate_data
+from from_git.common import sum_profiles
 
+
+class UtilsTestCase(TestCase):
+    def test_sum_profiles(self):
+        a = {
+            'originalRepos': 10,
+            'forkedRepos': 3,
+            'watchers': 15,
+            'followers': 10,
+            'langs': {"python", "php"},
+            'topics': {"a", "b"},
+        }
+        b = {
+            'originalRepos': 20,
+            'forkedRepos': 4,
+            'watchers': 7,
+            'followers': 8,
+            'langs': {"python", "c"},
+            'topics': {"b", "c"},
+        }
+        sum = {
+            'originalRepos': 30,
+            'forkedRepos': 7,
+            'watchers': 22,
+            'followers': 18,
+            'langs': {"python", "php", "c"},
+            'topics': {"a", "b", "c"},
+        }
+        self.assertDictEqual(sum_profiles(a, b), sum)
 
 class DownloadingTestCase(TestCase):
     def test_aggregate_one(self):
