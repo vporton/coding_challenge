@@ -40,6 +40,11 @@ class TeamWatchersCalculatorWorkerPool(multiprocessing.pool.ThreadPool):
         `url` is a team watchers info URL.
 
         Increases `data['total']`."""
+        with self.lock:  # avoid race conditions
+            if handler.exception is not None:  # no need to keep working
+                # We could decrease the handler.counter here, but it is not necessary
+                return
+
         logging.debug("GET %s" % url)
         try:
             watchers_response = requests.get(url)
