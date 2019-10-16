@@ -121,7 +121,8 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# Threads for the main processing pool an for downloading BitBucket watchers info
 NUM_THREADS_MAIN = 3
-NUM_THREADS_ADDITIONAL = 3
+NUM_THREADS_BITBUCKET_WATCHERS = 3
 
 from local_settings import *

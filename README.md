@@ -14,7 +14,7 @@ virtualenv -p python3 ~/.virtualenv/coding_challenge-porton
 source ~/.virtualenv/coding_challenge-porton/bin/activate
 ```
 
-Or just pip install from the requirements file
+Then pip install from the requirements file
 ``` 
 pip install -r requirements.txt
 ```
@@ -119,7 +119,7 @@ I noticed other users made public forks too, so I am not the only
 "insider".
 
 In the case if a repository is missing, we return it in the list
-of missing repositories (check if it is empty to ensure not errors)
+of missing repositories (check if it is empty to ensure no errors)
 and ignore this repo in the statistics.
 
 Followers and topics are missing on BitBucket, so I return zero for them.

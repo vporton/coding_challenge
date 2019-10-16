@@ -21,7 +21,7 @@ class TeamWatchersCalculatorWorkerPool(multiprocessing.pool.ThreadPool):
     """Counting team watchers for a repository. Running multiple network queries in parallel."""
 
     def __init__(self):
-        super().__init__(settings.NUM_THREADS_ADDITIONAL)
+        super().__init__(settings.NUM_THREADS_BITBUCKET_WATCHERS)
         self.lock = multiprocessing.Lock()  # against race conditions
 
     def start_getting(self, handler, data, url):
