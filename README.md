@@ -5,7 +5,8 @@ A Django app for a solution to a:
 
 ## Install:
 
-TODO
+Download from GitHub and chdir into the project
+directory.
 
 You can use a virtual environment created by virtualenv:
 ```
@@ -27,6 +28,10 @@ GITHUB_API_TOKEN = 'XXX'
 You can create this token using "Developer settings" /
 "Personal access tokens" in GitHub settings. It must
 have `public_repo` permission.
+
+You can also configure maxiumum number of threads
+separately for the main API requests and for
+BitBucket watchers info API requests.
 
 ## Running the code
 
@@ -58,8 +63,6 @@ python manage.py test
 
 ### Making Requests
 
-TODO
-
 ```
 curl -i "http://127.0.0.1:8000/health-check?url=https://github.com/mailchimp&url=https://bitucket.org/mailchimp"
 ```
@@ -67,6 +70,9 @@ curl -i "http://127.0.0.1:8000/health-check?url=https://github.com/mailchimp&url
 
 Alternatively you can enter one URL at a line in the
 form at `http://127.0.0.1:8000/from-git/test`.
+
+The format of the reponse can be viewed with this
+`http://127.0.0.1:8000/from-git/test`.
 
 ## Implementation and performance notes
 
