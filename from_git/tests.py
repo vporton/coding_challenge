@@ -1,9 +1,12 @@
+import logging
+
 from django.test import TestCase
 
 import from_git
 from from_git.aggregator import aggregate_one, WrongURLException, aggregate_data
 from from_git.common import sum_profiles
 
+logging.basicConfig(level=logging.DEBUG)
 
 class UtilsTestCase(TestCase):
     def test_sum_profiles(self):

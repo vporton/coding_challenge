@@ -1,3 +1,4 @@
+import logging
 import multiprocessing
 import threading
 from copy import deepcopy
@@ -39,7 +40,7 @@ class TeamWatchersCalculatorWorkerPool(multiprocessing.pool.ThreadPool):
         `url` is a team watchers info URL.
 
         Increases `data['total']`."""
-        print("processing %s" % url)
+        logging.debug("GET %s" % url)
         try:
             watchers_response = requests.get(url)
             with self.lock:  # avoid race conditions
@@ -72,6 +73,7 @@ def list_team_repos(team, fields):
 
     # Keep fetching pages while there's a page to fetch
     while next_page_url is not None:
+        logging.debug("GET %s" % next_page_url)
         response = requests.get(next_page_url)
         if not response.ok:
             yield TeamNotFound()

@@ -2,6 +2,7 @@
 # I chose the least general library as probably faster and better
 # suited for our rather specialized task.
 import json
+import logging
 from copy import deepcopy
 
 from django.conf import settings
@@ -45,6 +46,7 @@ def get_repositories_for_org(client, org):
     while True:
         after_str = ", after: \"%s\"" % after if after is not None else ""
         number_of_repos_in_query = 100
+        logging.debug("GraphQL request to GitHub")
         j = client.execute('''
         {
             organization(login: %s) {
