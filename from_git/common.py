@@ -35,8 +35,8 @@ def sum_profiles(a, b):
         'forkedRepos': a['forkedRepos'] + b['forkedRepos'],
         'watchers': a['watchers'] + b['watchers'],
         'followers': a['followers'] + b['followers'],
-        'langsNum': a['langsNum'] + b['langsNum'],
+        # 'langsNum': a['langsNum'] + b['langsNum'],
         'langs': a['langs'] | b['langs'],
-        'topicsNum': a['topicsNum'] + b['topicsNum'],
+        # 'topicsNum': a['topicsNum'] + b['topicsNum'],
         'topics': a['topics'] | b['topics'],
     }

@@ -20,7 +20,7 @@ def list_team_repos(team, fields):
 
         # Parse repositories from the JSON
         for repo in page_json['values']:
-            yield repo['slug']
+            yield repo
 
         # Get the next page URL, if present
         # It will include same query parameters, so no need to append them again
@@ -37,7 +37,7 @@ def process_repository(repo):
     the project grows and we'd need this abstraction."""
     result = deepcopy(zero_data)
     if not repo['is_private']:
-        if 'parent' in repo['parent']:  # check if forked
+        if 'parent' in repo:  # check if forked
             result['forkedRepos'] = 1
         else:
             result['originalRepos'] = 1
@@ -51,8 +51,10 @@ def process_repository(repo):
     return result
 
 
-def download_organization(url):
+def download_team(url):
     team = url.replace('https://bitbucket.org/', '', 1)
+    result = deepcopy(zero_data)  # still zero repos processed
     for repo in list_team_repos(team, 'values.is_private,values.parent,values.links.watchers.href,values.language'):
-        result = sum_profiles(result, process_repository(repo))
+        processed_team_data = process_repository(repo)
+        result = sum_profiles(result, processed_team_data)
     return result
