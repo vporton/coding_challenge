@@ -132,3 +132,7 @@ BitBucket and 1 thread on GitHub on a low end system
 but even in this case we need to run them in parallel.
 Also so it is easier to implement because we use
 different functions to peform downloading for GH and BB.
+
+We use a separate thread pool for downloading watcher counters. It would be better to have a common thread pool, but that's not easy to implement, for example because of deadlocks.
+
+The numbers of threads allocated are configurable in `local_settings.py`, as explained in `settings.py`.
