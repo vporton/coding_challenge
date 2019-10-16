@@ -43,8 +43,6 @@ not used in my code, but for greater reliability I advise to
 create the DB, because the Django workflow requires it. You could
 reconfigure it to hold the SQLite file in /tmp/.
 
-TODO: local_settings.py
-
 ### Spin up the service
 
 Then you can start the project in debug mode by

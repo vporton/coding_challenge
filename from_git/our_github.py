@@ -99,7 +99,7 @@ def download_organization(url):
     result = deepcopy(zero_data)  # still zero repos processed
     org = url.replace('https://github.com/', '', 1)
     client = GraphQLClient('https://api.github.com/graphql')
-    client.inject_token('Bearer ' + settings.GITHUB_API_TOKEN)  # TODO: Don't hardcode
+    client.inject_token('Bearer ' + settings.GITHUB_API_TOKEN)
     repositories = get_repositories_for_org(client, org)
 
     for repo in repositories:
