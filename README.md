@@ -122,3 +122,10 @@ TODO: github3.py and otherwise caching.
 TODO: handling gh/bb errors.
 
 TODO: rate limit errors.
+
+We have separate thread pools for GitHub and BitBucket
+because: 1. One could have for example 1 thread on
+BitBucket and 1 thread on GitHub on a low end system
+but even in this case we need to run them in parallel.
+Also so it is easier to implement because we use
+different functions to peform downloading for GH and BB.
