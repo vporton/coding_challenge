@@ -56,8 +56,8 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
         result_for_one_team = aggregate_one(url)
         with self.lock:  # avoid race conditions
             if result_for_one_team is None:
-                result.missing.push(url)
-            if result_for_one_team is not None:
+                result.missing.append(url)
+            else:
                 result.data = sum_profiles(result.data, result_for_one_team)
             result.counter -= 1  # this thread is ready
             if not result.counter:
