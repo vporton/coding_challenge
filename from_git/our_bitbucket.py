@@ -79,7 +79,6 @@ def process_repository(total, repo, watchers_handler):
 
     # Query to update result['watchers'] in a separate thread,
     # Don't retrieve the items, only size.
-    # We apply it to total not to individual repos.
     watchers_threads_pool.start_getting(watchers_handler, total, repo['links']['watchers']['href'] + '?pagelen=0')
 
     # No pybitbucket wrapper, do ourselves:
@@ -94,10 +93,11 @@ def process_repository(total, repo, watchers_handler):
 def download_team(url):
     team = url.replace('https://bitbucket.org/', '', 1)
     result = deepcopy(zero_data)  # still zero repos processed
+    total = {'watchers': 0}
     watchers_handler = RepoWatchersHandler()
     for repo in list_team_repos(team, 'values.is_private,values.parent,values.links.watchers.href,values.language'):
-        processed_team_data = process_repository(result, repo, watchers_handler)
-        with watchers_handler.lock:
-            result = sum_profiles(result, processed_team_data)
+        processed_team_data = process_repository(total, repo, watchers_handler)
+        result = sum_profiles(result, processed_team_data)
     watchers_handler.ready.wait()  # Wait when all watchers requests finish
+    result['watchers'] = total['watchers']
     return result
