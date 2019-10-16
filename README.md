@@ -18,6 +18,16 @@ Or just pip install from the requirements file
 pip install -r requirements.txt
 ```
 
+You must create the file `local_settings.py` in the
+project folder containing your GitHub API token like:
+```python
+GITHUB_API_TOKEN = 'XXX'
+```
+
+You can create this token using "Developer settings" /
+"Personal access tokens" in GitHub settings. It must
+have `public_repo` permission.
+
 ## Running the code
 
 First you need to run once to create the DB (by default it is
@@ -73,14 +83,12 @@ of organizations is big, the GET request would have a very long
 URL and not work on very old browsers. It is very easy to change
 the code to use POST (or even support both GET and POST).  
 
-My code ideally should be multithreaded or asynchronous to handle
-several GH/BB requests in parallel, but that would take too much
-time to implement. Otherwise it is near to be most efficient
-possible for a DRF project (however see code comments). It could be
-improved a little by "summing" data from several requests at once
-rather than by pairs but that improvement would be minor. (It is
-minor, I note it only because I was specifically asked about
-efficiency.)
+Multithreading with `ThreadPool` is used to reduce
+network transfer time from the source servers.
+
+It is rather near to be most efficient
+possible for a DRF project (however see code comments). Memory usage can be reduced by eliminating
+`python-graphql-client` dependency,
 
 In the output the keywords are sorted to make requests
 deterministic. This may also improve caching, what is however
@@ -106,22 +114,17 @@ return an error response, because otherwise the statistics would
 be wrong. Should have to retry if the possible number of queried
 repos would be big, but this is not implemented (TODO).
 
-Data is returned in "data" subobject to be differentiated from
+Data is returned in `"data"` subobject to be differentiated from
 errors.
 
-Should have used GraphQL GitHub API (v4) to reduce the transfered
-data amount, but sadly there is no support of GraphQL in used librarires and this is a
-quick project. If I'd worked on a serious project, I'd use GraphQL.
-
-TODO: ETag and date
+I used GraphQL GitHub API (v4) to reduce the transfered
+data amount.
 
 TODO: Check if a profile in request provided more than once. 
 
-TODO: github3.py and otherwise caching.
+TODO: caching.
 
 TODO: handling gh/bb errors.
-
-TODO: rate limit errors.
 
 We have separate thread pools for GitHub and BitBucket
 because: 1. One could have for example 1 thread on
