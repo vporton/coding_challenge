@@ -33,7 +33,8 @@ def process_repository(repo):
     result['watchers'] = repo['watchers']['totalCount']
     result['followers'] = repo['stargazers']['totalCount']
     if not repo['isPrivate']:
-        result['langs'] = set(t['name'] for t in repo['languages']['nodes'])
+        # lower() to be compatible to BitBucket
+        result['langs'] = set(t['name'].lower() for t in repo['languages']['nodes'])
     result['topics'] = set(t['topic']['name'] for t in repo['repositoryTopics']['nodes'])
 
     return result
