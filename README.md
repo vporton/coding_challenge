@@ -122,7 +122,7 @@ repos would be big, but this is not implemented (TODO).
 Data is returned in `"data"` subobject to be differentiated from
 errors.
 
-I used GraphQL GitHub API (v4) to reduce the transfered
+I used GraphQL GitHub API (v4) instead of REST API (v4) to reduce the transfered
 data amount.
 
 TODO: Check if a profile in request provided more than once. 
