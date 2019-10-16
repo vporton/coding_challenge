@@ -19,8 +19,9 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
     """Running multiple network queries in parallel."""
 
     def __init__(self):
-        self.lock = multiprocessing.Lock()  # against race conditions
         super().__init__(settings.NUM_THREADS_ADDITIONAL)
+        self.lock = multiprocessing.Lock()  # against race conditions
+        self.exception = None
 
     def start_getting(self, handler, data, url):
         """Run our aggregation from multiple GH/BB teams in parallel and return the result."""
@@ -32,12 +33,19 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
     def process_one(self, handler, data, url):
         """Aggregate one organization/team into our aggregation data."""
         print("processing %s" % url)
-        watchers_response = requests.get(url)
-        with self.lock:  # avoid race conditions
-            data['watchers'] += watchers_response.json()['size']
-            handler.counter -= 1  # this thread is ready
-            if not handler.counter:
-                handler.ready.set()  # Notify that we have finished with this result object,
+        try:
+            watchers_response = requests.get(url)
+            with self.lock:  # avoid race conditions
+                data['watchers'] += watchers_response.json()['size']
+                handler.counter -= 1  # this thread is ready
+                if not handler.counter:
+                    handler.ready.set()  # Notify that we have finished with this result object.
+        except Exception as ex:
+            with self.lock:
+                handler.exception = ex
+                # handler.counter is nonzero indicating an error
+                handler.ready.set()
+                self.terminate()
 
 
 watchers_threads_pool = WorkerPool()
@@ -101,6 +109,7 @@ def download_team(url):
     """Return aggregated team data (see `common.py`) or `None` if no such team."""
     team = url.replace('https://bitbucket.org/', '', 1)
     result = deepcopy(zero_data)  # still zero repos processed
+
     lst = list_team_repos(team, 'values.is_private,values.parent,values.links.watchers.href,values.language')
     total = {'watchers': 0}
     watchers_handler = RepoWatchersHandler()
@@ -109,6 +118,10 @@ def download_team(url):
             return None
         processed_team_data = process_repository(total, repo, watchers_handler)
         result = sum_profiles(result, processed_team_data)
+
     watchers_handler.ready.wait()  # Wait when all watchers requests finish
+    if watchers_handler.exception is not None:
+        raise watchers_handler.exception
+
     result['watchers'] = total['watchers']
     return result
