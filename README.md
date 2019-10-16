@@ -99,7 +99,9 @@ In the output the keywords are sorted to make requests
 deterministic. This may also improve caching, what is however
 currently unimportant because our responses are small.
 
-The main Django app of the project is from_git,
+The main Django app of the project is `from_git`.
+
+I use a global `ThreadPool` variable rather than creating it for every request, because this allows to lower server load under normal circumstances, but we have no way to interrupt requests in the case of an error. TODO: Cancel loading BitBucket watchers in the case of an error.
 
 ## Other notes
 
