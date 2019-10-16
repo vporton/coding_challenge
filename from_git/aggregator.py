@@ -63,7 +63,7 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
                 result.exception = ex
                 # result.counter is nonzero indicating an error
                 result.ready.set()
-                self.terminate()
+                # There is no way to terminate AsyncResult, just wait when it completes :-(
         else:
             with self.lock:  # avoid race conditions
                 if result_for_one_team is None:

@@ -13,6 +13,7 @@ class RepoWatchersHandler(object):
     def __init__(self):
         self.counter = 0  # counter of threads working now to produce this result (NOT the number of workers)
         self.ready = threading.Event()  # when the downloading finishes
+        self.exception = None
 
 
 class WorkerPool(multiprocessing.pool.ThreadPool):
@@ -21,7 +22,6 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
     def __init__(self):
         super().__init__(settings.NUM_THREADS_ADDITIONAL)
         self.lock = multiprocessing.Lock()  # against race conditions
-        self.exception = None
 
     def start_getting(self, handler, data, url):
         """Run our aggregation from multiple GH/BB teams in parallel and return the result."""
@@ -45,7 +45,7 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
                 handler.exception = ex
                 # handler.counter is nonzero indicating an error
                 handler.ready.set()
-                self.terminate()
+                # There is no way to terminate AsyncResult, just wait when it completes :-(
 
 
 watchers_threads_pool = WorkerPool()
