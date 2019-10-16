@@ -4,15 +4,10 @@
 import json
 from copy import deepcopy
 
-import github3
 from django.conf import settings
 from graphqlclient import GraphQLClient
 
 from from_git.common import zero_data, sum_profiles
-
-# TODO: Should be thread-local?
-# Allow github3.py to store data in a cache
-etag = None  # GitHub last returned ETag
 
 
 def process_repository(repo):
@@ -104,9 +99,11 @@ def download_organization(url):
     client = GraphQLClient('https://api.github.com/graphql')
     client.inject_token('Bearer ' + settings.GITHUB_API_TOKEN)  # TODO: Don't hardcode
     repositories = get_repositories_for_org(client, org)
-    if repositories is None:
+
+    try:
+        for repo in repositories:
+            pocessed_repo_data = process_repository(repo)
+            result = sum_profiles(result, pocessed_repo_data)
+    except StopIteration:
         return None
-    for repo in repositories:
-        pocessed_repo_data = process_repository(repo)
-        result = sum_profiles(result, pocessed_repo_data)
     return result

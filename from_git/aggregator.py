@@ -15,7 +15,7 @@ class WrongURLException(Exception):
 
 
 def aggregate_one(url):
-    """Get data from either GitHub o BitBucket."""
+    """Get data from either GitHub or BitBucket."""
     if url.startswith("https://github.com/"):
         return our_github.download_organization(url)
     elif url.startswith("https://bitbucket.org/"):
