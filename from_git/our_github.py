@@ -83,7 +83,7 @@ def get_repositories_for_org(client, org):
                 }
             }
         }
-        ''' % (org, number_of_repos_in_query, after_str))  # hardcoded limit  # FIXME: calculation
+        ''' % (org, number_of_repos_in_query, after_str))
         # TODO: Debug pagination
         data = json.loads(j)
         if 'errors' in data:
