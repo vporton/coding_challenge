@@ -1,5 +1,6 @@
 from django.test import TestCase
 
+import from_git
 from from_git.aggregator import aggregate_one, WrongURLException, aggregate_data
 from from_git.common import sum_profiles
 
@@ -33,6 +34,21 @@ class UtilsTestCase(TestCase):
         self.assertDictEqual(sum_profiles(a, b), sum)
 
 class DownloadingTestCase(TestCase):
+    def test_gh_bb(self):
+        data = from_git.our_github.download_organization("https://github.com/mailchimp")
+        assert(data['originalRepos'] > 1)
+        assert("python" in data['langs'])
+
+        data = from_git.our_bitbucket.download_team("https://bitbucket.org/mailchimp")
+        assert(data['originalRepos'] > 1)
+        assert("python" in data['langs'])
+
+        data = from_git.our_github.download_organization("https://github.com/jfdskfhdskhgjk")
+        assert (data is None)
+
+        data = from_git.our_bitbucket.download_team("https://bitbucket.org/fjsldkhgkjd")
+        assert (data is None)
+
     def test_aggregate_one(self):
         for url in ["https://github.com/mailchimp", "https://bitbucket.org/mailchimp"]:
             data = aggregate_one(url)
@@ -41,7 +57,6 @@ class DownloadingTestCase(TestCase):
         for url in ["https://github.com/jsdkgjhds", "https://bitbucket.org/hsjdhtjehrje"]:
             data = aggregate_one(url)
             assert(data is None)
-            #assert(len(missing) == 1)
         self.assertRaises(WrongURLException, aggregate_one, "hjhjk")
 
     def test_aggregate_data(self):
