@@ -28,7 +28,7 @@ class Result(object):
     def __init__(self):
         self.data = zero_data
         self.counter = 0  # counter of threads working to produce this result
-        self.event = threading.Event()
+        self.ready = threading.Event()
 
 
 class WorkerPool(multiprocessing.pool.ThreadPool):
@@ -44,7 +44,7 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
             result.counter += 1  # do not return until it is zero again
             self.apply_async(WorkerPool.process_one, (self, result, url))
         # Can acquire only when all calls are finished:
-        result.event.wait()
+        result.ready.wait()
         return result.data
 
     @staticmethod
@@ -54,7 +54,7 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
             result.data = sum_profiles(result.data, result_for_one_team)
             result.counter -= 1
             if not result.counter:
-                result.event.set()  # Notify that we have finished with this result object,
+                result.ready.set()  # Notify that we have finished with this result object,
 
 
 threads_pool = WorkerPool()
