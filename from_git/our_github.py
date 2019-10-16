@@ -35,6 +35,10 @@ def process_repository(repo):
     return result
 
 
+class RepoNotFound(object):
+    pass
+
+
 def get_repositories_for_org(client, org):
     """Return aggregated organization data (see `common.py`) or `None` if no such org."""
     after = None
@@ -83,8 +87,8 @@ def get_repositories_for_org(client, org):
         # TODO: Debug pagination
         data = json.loads(j)
         if 'errors' in data:
-            if data['errors']['type'] == 'NOT_FOUND':
-                return None
+            if data['data']['organization'] is None:
+                yield RepoNotFound()
         data = data['data']['organization']['repositories']
         yield from data['edges']
         if not data['pageInfo']['hasNextPage']:
@@ -100,10 +104,9 @@ def download_organization(url):
     client.inject_token('Bearer ' + settings.GITHUB_API_TOKEN)  # TODO: Don't hardcode
     repositories = get_repositories_for_org(client, org)
 
-    try:
-        for repo in repositories:
-            pocessed_repo_data = process_repository(repo)
-            result = sum_profiles(result, pocessed_repo_data)
-    except StopIteration:
-        return None
+    for repo in repositories:
+        if isinstance(repo, RepoNotFound):
+            return None
+        pocessed_repo_data = process_repository(repo)
+        result = sum_profiles(result, pocessed_repo_data)
     return result

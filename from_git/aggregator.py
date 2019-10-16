@@ -54,9 +54,9 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
     def process_one(self, result, url):
         """Aggregate one organization/team into our aggregation data."""
         result_for_one_team = aggregate_one(url)
-        if result_for_one_team is None:
-            result.missing.push(url)
         with self.lock:  # avoid race conditions
+            if result_for_one_team is None:
+                result.missing.push(url)
             if result_for_one_team is not None:
                 result.data = sum_profiles(result.data, result_for_one_team)
             result.counter -= 1  # this thread is ready
