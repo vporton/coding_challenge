@@ -109,7 +109,7 @@ currently unimportant because our responses are small.
 
 The main Django app of the project is `from_git`.
 
-I use a global `ThreadPool` variable rather than creating it for every request, because this allows to lower server load under normal circumstances, but we have no way to interrupt requests in the case of an error. TODO: Cancel loading BitBucket watchers in the case of an error.
+I use a global `ThreadPool` variable rather than creating it for every request, because this allows to lower server load under normal circumstances, but we have no way to interrupt requests in the case of an error.
 
 ## Other notes
 
@@ -126,8 +126,7 @@ Followers and topics are missing on BitBucket, so I return zero for them.
 
 If GitHub or BitBucket does not respond OK at least once, we
 return an error response, because otherwise the statistics would
-be wrong. Should have to retry if the possible number of queried
-repos would be big, but this is not implemented (TODO).
+be wrong.
 
 Data is returned in `"data"` subobject to be differentiated from
 errors.
@@ -135,9 +134,8 @@ errors.
 I used GraphQL GitHub API (v4) instead of REST API (v4) to reduce the transfered
 data amount.
 
-TODO: Check if a profile in request provided more than once. 
-
-TODO: handling gh/bb errors.
+If a profile in request provided more than once, it is counted more
+than once. 
 
 We have separate thread pools for GitHub and BitBucket
 because: 1. One could have for example 1 thread on
@@ -162,5 +160,3 @@ the code more complex reducing maintainability.
 
 Ideally we should add ETag and last mod time to our
 responses, but that's would be not easy and error-prone.
-
-TODO: logging
