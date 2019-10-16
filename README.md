@@ -120,3 +120,5 @@ TODO: Check if a profile in request provided more than once.
 TODO: github3.py and otherwise caching.
 
 TODO: handling gh/bb errors.
+
+TODO: rate limit errors.

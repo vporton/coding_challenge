@@ -63,12 +63,12 @@ def get_repositories_for_org(client, org):
                             stargazers {
                                 totalCount
                             }
-                            languages(first: 100) { # exprimentally found max value that works # FIXME
+                            languages(first: 100) { # limit from https://developer.github.com/v4/guides/resource-limitations/
                                 nodes {
                                     name
                                 }
                             }
-                            repositoryTopics(first: 100) { # exprimentally found max value that works
+                            repositoryTopics(first: 100) { # limit from https://developer.github.com/v4/guides/resource-limitations/
                                 nodes {
                                     topic {
                                         name
