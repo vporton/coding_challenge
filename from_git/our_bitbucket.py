@@ -81,7 +81,6 @@ def process_repository(total, repo, watchers_handler):
     # Don't retrieve the items, only size.
     watchers_threads_pool.start_getting(watchers_handler, total, repo['links']['watchers']['href'] + '?pagelen=0')
 
-    # No pybitbucket wrapper, do ourselves:
     # result['followers'] = 0  # No followers concept in BitBucket.
     if not repo['is_private'] and repo['language']:
         result['langs'] = {repo['language']}  # somehow ineffient
