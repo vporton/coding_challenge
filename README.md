@@ -63,8 +63,7 @@ curl -i "http://127.0.0.1:8000/health-check?url=https://github.com/mailchimp&url
 (You can provide any number of GitHub and BitButcket URLs in the request.)
 
 Alternatively you can enter one URL at a line in the
-form at `http://127.0.0.1:8000/from-git/test`. Do not
-end it with a blank line.
+form at `http://127.0.0.1:8000/from-git/test`.
 
 ## Implementation and performance notes
 
@@ -154,3 +153,5 @@ the code more complex reducing maintainability.
 
 Ideally we should add ETag and last mod time to our
 responses, but that's would be not easy and error-prone.
+
+TODO: logging

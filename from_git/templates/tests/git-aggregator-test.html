@@ -5,7 +5,8 @@
     <title>Git aggregator test</title>
     <script>
         var onSubmit = function(form) {
-            var urls = document.getElementById('urls').value.split('\n');
+            // trimEnd() improves user-friendleness of the test
+            var urls = document.getElementById('urls').value.trimEnd().split('\n');
             for (var url in urls) {
                 var hidden = document.createElement('input');
                 hidden.setAttribute('type', 'hidden');
