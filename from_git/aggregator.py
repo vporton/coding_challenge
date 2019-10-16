@@ -31,6 +31,7 @@ class Aggregation(object):
         self.missing = []  # not found teams/orgs
         self.counter = 0  # counter of threads working now to produce this result (NOT the number of workers)
         self.ready = threading.Event()  # when the aggregation operation finishes
+        self.exception = None
 
 
 class WorkerPool(multiprocessing.pool.ThreadPool):
@@ -48,20 +49,30 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
             aggregation.counter += 1  # do not return until it is zero again
             self.apply_async(WorkerPool.process_one, (self, aggregation, url))
         aggregation.ready.wait()
+        if aggregation.exception is not None:
+            raise aggregation.exception
         return aggregation.data, aggregation.missing
 
     @staticmethod
     def process_one(self, result, url):
         """Aggregate one organization/team into our aggregation data."""
-        result_for_one_team = aggregate_one(url)
-        with self.lock:  # avoid race conditions
-            if result_for_one_team is None:
-                result.missing.append(url)
-            else:
-                result.data = sum_profiles(result.data, result_for_one_team)
-            result.counter -= 1  # this thread is ready
-            if not result.counter:
-                result.ready.set()  # Notify that we have finished with this result object,
+        try:
+            result_for_one_team = aggregate_one(url)
+        except Exception as ex:
+            with self.lock:
+                result.exception = ex
+                # result.counter is nonzero indicating an error
+                result.ready.set()
+                self.terminate()
+        else:
+            with self.lock:  # avoid race conditions
+                if result_for_one_team is None:
+                    result.missing.append(url)
+                else:
+                    result.data = sum_profiles(result.data, result_for_one_team)
+                result.counter -= 1  # this thread is ready
+                if not result.counter:
+                    result.ready.set()  # Notify that we have finished with this result object,
 
 
 threads_pool = WorkerPool()

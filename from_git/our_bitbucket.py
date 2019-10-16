@@ -58,7 +58,7 @@ def list_team_repos(team, fields):
     while next_page_url is not None:
         response = requests.get(next_page_url)
         if not response.ok:
-            yield RepoNotFound() # FIXME: What will happen if we return None when we already yielded something?
+            yield RepoNotFound()
         page_json = response.json()
 
         # Parse repositories from the JSON
