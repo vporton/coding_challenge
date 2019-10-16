@@ -11,7 +11,7 @@ class GitAggregator(views.APIView):
     def get(self, request):
         profiles = request.GET.getlist('url')  # no need to check for exceptions
         try:
-            data = aggregate_data(profiles)
+            data, missing = aggregate_data(profiles)
         except requests.exceptions.RequestException as e:
             # As the API complicates, should to create a special class for error responses.
             # I did this in the main Turing challenge.
@@ -19,7 +19,7 @@ class GitAggregator(views.APIView):
         except WrongURLException as e:
             return Response({'error': 'ERR2', 'message': str(e)})
         else:
-            return Response({'error': 'OK', 'data': data})
+            return Response({'error': 'OK', 'data': data, 'missing': missing})
 
 
 class GitAggregatorTest(views.View):

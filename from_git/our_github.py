@@ -41,6 +41,7 @@ def process_repository(repo):
 
 
 def get_repositories_for_org(client, org):
+    """Return aggregated organization data (see `common.py`) or `None` if no such org."""
     after = None
     while True:
         # FIXME: quoting
@@ -85,7 +86,11 @@ def get_repositories_for_org(client, org):
         }
         ''' % (org, number_of_repos_in_query, after_str))  # hardcoded limit  # FIXME: calculation
         # TODO: Debug pagination
-        data = json.loads(j)['data']['organization']['repositories']
+        data = json.loads(j)
+        if 'errors' in data:
+            if data['errors']['type'] == 'NOT_FOUND':
+                return None
+        data = data['data']['organization']['repositories']
         yield from data['edges']
         if not data['pageInfo']['hasNextPage']:
             break
@@ -93,11 +98,15 @@ def get_repositories_for_org(client, org):
 
 
 def download_organization(url):
+    """Return aggregated organization data (see `common.py`) or `None` if no such org."""
     result = deepcopy(zero_data)  # still zero repos processed
     org = url.replace('https://github.com/', '', 1)
     client = GraphQLClient('https://api.github.com/graphql')
     client.inject_token('Bearer ' + settings.GITHUB_API_TOKEN)  # TODO: Don't hardcode
-    for repo in get_repositories_for_org(client, org):
+    repositories = get_repositories_for_org(client, org)
+    if repositories is None:
+        return None
+    for repo in repositories:
         pocessed_repo_data = process_repository(repo)
         result = sum_profiles(result, pocessed_repo_data)
     return result

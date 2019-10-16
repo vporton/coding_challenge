@@ -45,12 +45,16 @@ watchers_threads_pool = WorkerPool()
 
 # Based on https://community.atlassian.com/t5/Bitbucket-discussions/How-to-list-all-repositories-of-a-team-through-Bitbucket-REST/td-p/1142643
 def list_team_repos(team, fields):
+    """Yields repository data for each team's repository. Or return `None` if no such team."""
+
     # Request 100 repositories per page (and only their slugs), and the next page URL
     next_page_url = 'https://api.bitbucket.org/2.0/repositories/%s?pagelen=100&fields=next,%s' % (team, fields)
 
     # Keep fetching pages while there's a page to fetch
     while next_page_url is not None:
         response = requests.get(next_page_url)
+        if not response.ok:
+            return None  # FIXME: What will happen if we return None when we already yielded something?
         page_json = response.json()
 
         # Parse repositories from the JSON
@@ -90,11 +94,15 @@ def process_repository(total, repo, watchers_handler):
 
 
 def download_team(url):
+    """Return aggregated team data (see `common.py`) or `None` if no such team."""
     team = url.replace('https://bitbucket.org/', '', 1)
     result = deepcopy(zero_data)  # still zero repos processed
+    lst = list_team_repos(team, 'values.is_private,values.parent,values.links.watchers.href,values.language')
+    if lst is None:
+        return None
     total = {'watchers': 0}
     watchers_handler = RepoWatchersHandler()
-    for repo in list_team_repos(team, 'values.is_private,values.parent,values.links.watchers.href,values.language'):
+    for repo in lst:
         processed_team_data = process_repository(total, repo, watchers_handler)
         result = sum_profiles(result, processed_team_data)
     watchers_handler.ready.wait()  # Wait when all watchers requests finish

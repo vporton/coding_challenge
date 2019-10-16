@@ -28,6 +28,7 @@ class Aggregation(object):
     """Data in the middle of our aggregation process."""
     def __init__(self):
         self.data = zero_data  # nothing downloaded yet
+        self.missing = []  # not found teams/orgs
         self.counter = 0  # counter of threads working now to produce this result (NOT the number of workers)
         self.ready = threading.Event()  # when the aggregation operation finishes
 
@@ -40,20 +41,24 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
         super().__init__(settings.NUM_THREADS_MAIN)
 
     def run(self, urls):
-        """Run our aggregation from multiple GH/BB teams in parallel and return the result."""
+        """Run our aggregation from multiple GH/BB teams in parallel and
+        return the result and the list of missing teams/orgs."""
         aggregation = Aggregation()
         for url in urls:
             aggregation.counter += 1  # do not return until it is zero again
             self.apply_async(WorkerPool.process_one, (self, aggregation, url))
         aggregation.ready.wait()
-        return aggregation.data
+        return aggregation.data, aggregation.missing
 
     @staticmethod
     def process_one(self, result, url):
         """Aggregate one organization/team into our aggregation data."""
         result_for_one_team = aggregate_one(url)
+        if result_for_one_team is None:
+            result.missing.push(url)
         with self.lock:  # avoid race conditions
-            result.data = sum_profiles(result.data, result_for_one_team)
+            if result_for_one_team is not None:
+                result.data = sum_profiles(result.data, result_for_one_team)
             result.counter -= 1  # this thread is ready
             if not result.counter:
                 result.ready.set()  # Notify that we have finished with this result object,
@@ -63,11 +68,12 @@ threads_pool = WorkerPool()
 
 
 def aggregate_data(profiles):
-    s = threads_pool.run(profiles)
+    """Return aggregated teams/orgs data (see `common.py`) and the list of not found teams/orgs."""
+    s, missing = threads_pool.run(profiles)
 
     s['langs'] = list(sorted(s['langs']))  # Transform the set into a list, see README.
     s['topics'] = list(sorted(s['topics']))  # Transform the set into a list, see README.
     s['langsNum'] = len(s['langs'])
     s['topicsNum'] = len(s['topics'])
 
-    return s
+    return s, missing
