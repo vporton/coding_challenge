@@ -43,12 +43,11 @@ def get_repositories_for_org(client, org):
     """Return aggregated organization data (see `common.py`) or `None` if no such org."""
     after = None
     while True:
-        # FIXME: quoting
         after_str = ", after: \"%s\"" % after if after is not None else ""
         number_of_repos_in_query = 100
         j = client.execute('''
         {
-            organization(login: "%s") {
+            organization(login: %s) {
                 repositories(first: %d%s) {
                     edges {
                         node {
@@ -83,7 +82,7 @@ def get_repositories_for_org(client, org):
                 }
             }
         }
-        ''' % (org, number_of_repos_in_query, after_str))
+        ''' % (json.dumps(org), number_of_repos_in_query, after_str))
         # TODO: Debug pagination
         data = json.loads(j)
         if 'errors' in data:
