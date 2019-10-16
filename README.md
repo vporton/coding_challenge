@@ -51,6 +51,11 @@ Then you can start the project in debug mode by
 python manage.py runserver 
 ```
 
+You can do unittests:
+```
+python manage.py test 
+```
+
 ### Making Requests
 
 TODO
