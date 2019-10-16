@@ -58,8 +58,13 @@ python manage.py runserver
 TODO
 
 ```
-curl -i "http://127.0.0.1:8000/health-check"
+curl -i "http://127.0.0.1:8000/health-check?url=https://github.com/mailchimp&url=https://bitucket.org/mailchimp"
 ```
+(You can provide any number of GitHub and BitButcket URLs in the request.)
+
+Alternatively you can enter one URL at a line in the
+form at `http://127.0.0.1:8000/from-git/test`. Do not
+end it with a blank line.
 
 ## Implementation and performance notes
 
@@ -122,8 +127,6 @@ data amount.
 
 TODO: Check if a profile in request provided more than once. 
 
-TODO: caching.
-
 TODO: handling gh/bb errors.
 
 We have separate thread pools for GitHub and BitBucket
@@ -136,3 +139,16 @@ different functions to peform downloading for GH and BB.
 We use a separate thread pool for downloading watcher counters. It would be better to have a common thread pool, but that's not easy to implement, for example because of deadlocks.
 
 The numbers of threads allocated are configurable in `local_settings.py`, as explained in `settings.py`.
+
+I do not do HTTP caching, because it was not asked in the project spec and it can be easily and
+automatically be done with a proxy server like Squid.
+Moreover, using Squid would easily allow a persistent
+cache. So I avoid work duplication and complication
+of the code. We could also add caching if our
+calculated results, but that seems not very imporant,
+because most of the time is spend in network requests,
+and that caching of calculated results would make
+the code more complex reducing maintainability.
+
+Ideally we should add ETag and last mod time to our
+responses, but that's would be not easy and error-prone.
