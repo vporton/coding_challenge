@@ -32,6 +32,8 @@ class Result(object):
 
 
 class WorkerPool(multiprocessing.pool.ThreadPool):
+    """Running multiple network queries in parallel."""
+
     def __init__(self):
         self.lock = multiprocessing.Lock()
         super().__init__(settings.NUM_THREADS)
