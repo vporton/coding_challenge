@@ -27,7 +27,7 @@ zero_data = {
 }
 
 def sum_profiles(a, b):
-    """Make a "sum" of two profiles.
+    """Make a "sum" of two aggregated data values.
 
     Could be `__add__()` operator instead but that would need a special class what is more complication than a benefit."""
     return {

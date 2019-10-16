@@ -11,11 +11,12 @@ from from_git.common import zero_data, sum_profiles
 
 
 class WrongURLException(Exception):
+    """Not GitHub and not BitBucket."""
     pass
 
 
 def aggregate_one(url):
-    """Get data from either GitHub or BitBucket."""
+    """Get data from either GitHub or BitBucket and return aggregated data or `None` if doesn't exist."""
     if url.startswith("https://github.com/"):
         return our_github.download_organization(url)
     elif url.startswith("https://bitbucket.org/"):
@@ -48,7 +49,7 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
         for url in urls:
             aggregation.counter += 1  # do not return until it is zero again
             self.apply_async(WorkerPool.process_one, (self, aggregation, url))
-        aggregation.ready.wait()
+        aggregation.ready.wait()  # wait for finishing or error
         if aggregation.exception is not None:
             raise aggregation.exception
         return aggregation.data, aggregation.missing
