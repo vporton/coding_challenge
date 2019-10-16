@@ -121,4 +121,6 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+NUM_THREADS = 3
+
 from local_settings import *
