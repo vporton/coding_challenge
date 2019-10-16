@@ -1,11 +1,46 @@
-# We have a choice of python-bitbucket and atlassian-python-api. (Later found also fifbucket.)
-# python-bitbucket is incompatible with uitemplate 0.6 used by github.py.
-
+import multiprocessing
+import threading
 from copy import deepcopy
 
 import requests
+from django.conf import settings
 
 from from_git.common import zero_data, sum_profiles
+
+
+class RepoWatchersHandler(object):
+    """Counter of repository watchers for a repository (used in a thread)."""
+    def __init__(self):
+        self.counter = 0  # counter of threads working now to produce this result (NOT the number of workers)
+        self.ready = threading.Event()  # when the downloading finishes
+
+
+class WorkerPool(multiprocessing.pool.ThreadPool):
+    """Running multiple network queries in parallel."""
+
+    def __init__(self):
+        self.lock = multiprocessing.Lock()  # against race conditions
+        super().__init__(settings.NUM_THREADS_ADDITIONAL)
+
+    def start_getting(self, handler, data, url):
+        """Run our aggregation from multiple GH/BB teams in parallel and return the result."""
+        handler.counter += 1  # do not return until it is zero again
+        print("START %s" % url)
+        self.apply_async(WorkerPool.process_one, (self, handler, data, url))
+
+    @staticmethod
+    def process_one(self, handler, data, url):
+        """Aggregate one organization/team into our aggregation data."""
+        print("processing %s" % url)
+        watchers_response = requests.get(url)
+        with self.lock:  # avoid race conditions
+            data['watchers'] += watchers_response.json()['size']
+            handler.counter -= 1  # this thread is ready
+            if not handler.counter:
+                handler.ready.set()  # Notify that we have finished with this result object,
+
+
+watchers_threads_pool = WorkerPool()
 
 
 # Based on https://community.atlassian.com/t5/Bitbucket-discussions/How-to-list-all-repositories-of-a-team-through-Bitbucket-REST/td-p/1142643
@@ -27,7 +62,7 @@ def list_team_repos(team, fields):
         next_page_url = page_json.get('next', None)
 
 
-def process_repository(repo):
+def process_repository(total, repo, watchers_handler):
     """Process repo data.
 
     I don't needlessly abstract as the project specification does not require this,
@@ -41,20 +76,28 @@ def process_repository(repo):
             result['forkedRepos'] = 1
         else:
             result['originalRepos'] = 1
+
+    # Query to update result['watchers'] in a separate thread,
+    # Don't retrieve the items, only size.
+    # We apply it to total not to individual repos.
+    watchers_threads_pool.start_getting(watchers_handler, total, repo['links']['watchers']['href'] + '?pagelen=0')
+
     # No pybitbucket wrapper, do ourselves:
-    watchers_response = requests.get(repo['links']['watchers']['href'] + '?pagelen=0')  # don't retrieve the items, only size
-    result['watchers'] = watchers_response.json()['size']
     # result['followers'] = 0  # No followers concept in BitBucket.
     if not repo['is_private'] and repo['language']:
         result['langs'] = {repo['language']}  # somehow ineffient
     # result['topics'] = set()  # No topics concept in BitBucket
+
     return result
 
 
 def download_team(url):
     team = url.replace('https://bitbucket.org/', '', 1)
     result = deepcopy(zero_data)  # still zero repos processed
+    watchers_handler = RepoWatchersHandler()
     for repo in list_team_repos(team, 'values.is_private,values.parent,values.links.watchers.href,values.language'):
-        processed_team_data = process_repository(repo)
-        result = sum_profiles(result, processed_team_data)
+        processed_team_data = process_repository(result, repo, watchers_handler)
+        with watchers_handler.lock:
+            result = sum_profiles(result, processed_team_data)
+    watchers_handler.ready.wait()  # Wait when all watchers requests finish
     return result

@@ -52,7 +52,6 @@ def get_repositories_for_org(client, org):
                 repositories(first: %d%s) {
                     edges {
                         node {
-                            name # FIXME: remove
                             isPrivate
                             parent {
                                 id

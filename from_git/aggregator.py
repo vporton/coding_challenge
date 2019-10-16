@@ -37,7 +37,7 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
 
     def __init__(self):
         self.lock = multiprocessing.Lock()  # against race conditions
-        super().__init__(settings.NUM_THREADS)
+        super().__init__(settings.NUM_THREADS_MAIN)
 
     def run(self, urls):
         """Run our aggregation from multiple GH/BB teams in parallel and return the result."""
