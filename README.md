@@ -172,5 +172,7 @@ because most of the time is spend in network requests,
 and that caching of calculated results would make
 the code more complex reducing maintainability.
 
+I configured a Django middleware to automatically generate ETag for all GET responses. This can be removed if you would like a proxy server to do it for you instead. However, that's not very important, as the responses are usually small.
+
 Ideally we should add ETag and last mod time to our
 responses, but that's would be not easy and error-prone.
