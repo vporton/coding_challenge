@@ -1,6 +1,6 @@
 # Coding Challenge App
 
-A Django app for a solution to a:
+A Django app for a solution to a
 [coding challenge](https://drive.google.com/file/d/0B6y8e6-LG84naElFcTlkcHQ1bU1qUkM1Y2VhbXpMdnE4ZjJz/view).
 
 ## Install:
@@ -14,7 +14,7 @@ virtualenv -p python3 ~/.virtualenv/coding_challenge-porton
 source ~/.virtualenv/coding_challenge-porton/bin/activate
 ```
 
-Then pip install from the requirements file
+Then pip install from the requirements file:
 ``` 
 pip install -r requirements.txt
 ```
@@ -66,7 +66,7 @@ python manage.py test
 ```
 curl -i "http://127.0.0.1:8000/health-check?url=https://github.com/mailchimp&url=https://bitucket.org/mailchimp"
 ```
-(You can provide any number of GitHub and BitButcket URLs in the request.)
+(You can provide any number of GitHub and BitButcket URLs in the request. `github.com` and `bitbucket.org` must be in small letters.)
 
 Alternatively you can enter one URL at a line in the
 form at `http://127.0.0.1:8000/from-git/test`.
@@ -145,7 +145,7 @@ be wrong.
 Data is returned in `"data"` subobject to be differentiated from
 errors.
 
-I used GraphQL GitHub API (v4) instead of REST API (v4) to reduce the transfered
+I used GraphQL GitHub API (v4) instead of REST API (v3) to reduce the transfered
 data amount.
 
 If a profile in request provided more than once, it is counted more
@@ -174,5 +174,5 @@ the code more complex reducing maintainability.
 
 I configured a Django middleware to automatically generate ETag for all GET responses. This can be removed if you would like a proxy server to do it for you instead. However, that's not very important, as the responses are usually small.
 
-Ideally we should add ETag and last mod time to our
+Ideally we should add last mod time to our
 responses, but that's would be not easy and error-prone.
