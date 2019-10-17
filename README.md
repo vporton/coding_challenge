@@ -74,6 +74,20 @@ form at `http://127.0.0.1:8000/from-git/test`.
 The format of the reponse can be viewed with this
 `http://127.0.0.1:8000/from-git/test`.
 
+Error codes:
+
+OK
+: No error
+
+ERR2
+: Cannot read from an upstream server
+
+ERR3
+: Wrong request
+
+ERRX
+: All other errors
+
 ## Implementation and performance notes
 
 It was tested only with Python 3.7 instead of Python 3.6 because
@@ -160,5 +174,3 @@ the code more complex reducing maintainability.
 
 Ideally we should add ETag and last mod time to our
 responses, but that's would be not easy and error-prone.
-
-TODO: Describe error codes.
