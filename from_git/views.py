@@ -7,7 +7,7 @@ from from_git.aggregator import aggregate_data, WrongURLException
 
 
 class GitAggregator(views.APIView):
-    """The class that shows aggregation of several Git hostings data."""
+    """Show aggregation of several Git hostings data."""
     def get(self, request):
         profiles = request.GET.getlist('url')  # no need to check for exceptions
         try:
