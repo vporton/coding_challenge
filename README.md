@@ -160,3 +160,6 @@ the code more complex reducing maintainability.
 
 Ideally we should add ETag and last mod time to our
 responses, but that's would be not easy and error-prone.
+
+TODO: HTTP statuses for error responses.
+TODO: Describe error codes.
