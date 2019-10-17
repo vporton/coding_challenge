@@ -85,8 +85,7 @@ def list_team_repos(team, fields):
         page_json = response.json()
 
         # Parse repositories from the JSON
-        for repo in page_json['values']:
-            yield repo
+        yield from page_json['values']
 
         # Get the next page URL, if present
         # It will include same query parameters, so no need to append them again

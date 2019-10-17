@@ -47,10 +47,10 @@ class DownloadingTestCase(TestCase):
         assert("python" in data['langs'])
 
         data = from_git.our_github.download_organization("https://github.com/jfdskfhdskhgjk")
-        assert (data is None)
+        assert(data is None)
 
         data = from_git.our_bitbucket.download_team("https://bitbucket.org/fjsldkhgkjd")
-        assert (data is None)
+        assert(data is None)
 
     def test_aggregate_one(self):
         for url in ["https://github.com/mailchimp", "https://bitbucket.org/mailchimp"]:

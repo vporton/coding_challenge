@@ -1,5 +1,5 @@
 # We will form below the variable `arr` with each member in the format described in common.py
-# and "sum" its members together with the __add__() operator.
+# and "sum" its members together with the sum_profiles() function.
 # The sum will be returned in the JSON response.
 import multiprocessing.pool
 import threading

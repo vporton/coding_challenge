@@ -1,6 +1,3 @@
-# We have a choice of python-bitbucket and atlassian-python-api.
-# I chose the least general library as probably faster and better
-# suited for our rather specialized task.
 import json
 import logging
 from copy import deepcopy
