@@ -15,11 +15,11 @@ class GitAggregator(views.APIView):
         except requests.exceptions.RequestException as e:
             # As the API complicates, should to create a special class for error responses.
             # I did this in the main Turing challenge.
-            return Response({'error': 'ERR2', 'message': str(e)})
+            return Response({'error': 'ERR2', 'message': str(e)}, status=500)
         except WrongURLException as e:
-            return Response({'error': 'ERR3', 'message': str(e)})
+            return Response({'error': 'ERR3', 'message': str(e)}, status=400)
         except Exception as e:
-            return Response({'error': 'ERRX', 'message': str(e)})
+            return Response({'error': 'ERRX', 'message': str(e)}, status=500)
         else:
             return Response({'error': 'OK', 'data': data, 'missing': missing})
 
