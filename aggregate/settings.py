@@ -123,6 +123,7 @@ USE_TZ = True
 STATIC_URL = '/static/'
 
 # How much to download in one request, not recommended to be changed
+NUM_REPOS_IN_GITHUB_QUERY = 100
 BITBUCKET_REPOS_PER_PAGE = 100
 
 # Threads for the main processing pool an for downloading BitBucket watchers info

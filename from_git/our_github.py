@@ -42,7 +42,7 @@ def get_repositories_for_org(client, org):
     after_tag = None  # track pagination of GitHub API
     while True:
         after_str = ", after: \"%s\"" % after_tag if after_tag is not None else ""
-        number_of_repos_in_query = 100
+        number_of_repos_in_query = settings.NUM_REPOS_IN_GITHUB_QUERY
         logging.debug("GraphQL request to GitHub")
         j = client.execute('''
         {
