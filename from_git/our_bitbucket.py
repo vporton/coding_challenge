@@ -73,7 +73,7 @@ class TeamNotFound(object):
 def list_team_repos(team, fields):
     """Yields repository data for each team's repository. Or return `None` if no such team."""
 
-    # Request 100 repositories per page (and only their slugs), and the next page URL
+    # Request 100 repositories per page, and the next page URL
     next_page_url = 'https://api.bitbucket.org/2.0/repositories/%s?pagelen=100&fields=next,%s' % (team, fields)
 
     # Keep fetching pages while there's a page to fetch
