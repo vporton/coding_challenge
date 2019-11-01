@@ -9,9 +9,9 @@ from from_git.aggregator import aggregate_data, WrongURLException
 class GitAggregator(views.APIView):
     """Show aggregation of several Git hostings data."""
     def get(self, request):
-        profiles = request.GET.getlist('url')  # no need to check for exceptions
+        profile_urls = request.GET.getlist('url')  # no need to check for exceptions
         try:
-            data, missing = aggregate_data(profiles)
+            data, missing_urls = aggregate_data(profile_urls)
         except requests.exceptions.RequestException as e:
             # As the API complicates, should to create a special class for error responses.
             # I did this in the main Turing challenge.
@@ -21,7 +21,7 @@ class GitAggregator(views.APIView):
         except Exception as e:
             return Response({'error': 'ERRX', 'message': str(e)}, status=500)
         else:
-            return Response({'error': 'OK', 'data': data, 'missing': missing})
+            return Response({'error': 'OK', 'data': data, 'missing': missing_urls})
 
 
 class GitAggregatorTest(views.View):

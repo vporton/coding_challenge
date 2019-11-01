@@ -31,7 +31,7 @@ class Aggregation(object):
     def __init__(self):
         self.data = zero_data  # nothing downloaded yet
         self.missing = []  # not found teams/orgs
-        self.counter = 0  # counter of threads working now to produce this result (NOT the number of workers)
+        self.threads_counter = 0  # threads_counter of threads working now to produce this result (NOT the number of workers)
         self.ready = threading.Event()  # when the aggregation operation finishes
         self.exception = None
 
@@ -49,7 +49,7 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
         logging.debug("Starting the aggregation tread pool")
         aggregation = Aggregation()
         for url in urls:
-            aggregation.counter += 1  # do not return until it is zero again
+            aggregation.threads_counter += 1  # do not return until it is zero again
             logging.debug("Launching the thread for %s", url)
             self.apply_async(WorkerPool.process_one, (self, aggregation, url))
         aggregation.ready.wait()  # wait for finishing or error
@@ -65,7 +65,7 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
         except Exception as ex:
             with self.lock:
                 result.exception = ex
-                # result.counter is nonzero indicating an error
+                # result.threads_counter is nonzero indicating an error
                 result.ready.set()
                 logging.debug("Exception %s in data aggregation" % str(ex))
                 # There is no way to terminate AsyncResult, just wait when it completes :-(
@@ -75,9 +75,9 @@ class WorkerPool(multiprocessing.pool.ThreadPool):
                     result.missing.append(url)
                 else:
                     result.data = sum_profiles(result.data, result_for_one_team)
-                result.counter -= 1  # this thread is ready
+                result.threads_counter -= 1  # this thread is ready
                 logging.debug("Finished the thread for %s" % url)
-                if not result.counter:
+                if not result.threads_counter:
                     result.ready.set()  # Notify that we have finished with this result object,
                     logging.debug("Finished all threads for a data aggregation")
 
@@ -87,11 +87,11 @@ threads_pool = WorkerPool()
 
 def aggregate_data(profiles):
     """Return aggregated teams/orgs data (see `common.py`) and the list of not found teams/orgs."""
-    s, missing = threads_pool.run(profiles)
+    s, missing_urls = threads_pool.run(profiles)
 
     s['langs'] = list(sorted(s['langs']))  # Transform the set into a list, see README.
     s['topics'] = list(sorted(s['topics']))  # Transform the set into a list, see README.
     s['langsNum'] = len(s['langs'])
     s['topicsNum'] = len(s['topics'])
 
-    return s, missing
+    return s, missing_urls

@@ -39,9 +39,9 @@ class OrganizationNotFound(object):
 
 def get_repositories_for_org(client, org):
     """Return aggregated organization data (see `common.py`) or `None` if no such org."""
-    after = None  # track pagination of GitHub API
+    after_tag = None  # track pagination of GitHub API
     while True:
-        after_str = ", after: \"%s\"" % after if after is not None else ""
+        after_str = ", after: \"%s\"" % after_tag if after_tag is not None else ""
         number_of_repos_in_query = 100
         logging.debug("GraphQL request to GitHub")
         j = client.execute('''
@@ -90,7 +90,7 @@ def get_repositories_for_org(client, org):
         yield from data['edges']
         if not data['pageInfo']['hasNextPage']:  # This was the last page.
             break
-        after = data['pageInfo']['endCursor']
+        after_tag = data['pageInfo']['endCursor']
 
 
 def download_organization(url):

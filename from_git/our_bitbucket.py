@@ -12,7 +12,7 @@ from from_git.common import zero_data, sum_profiles
 class TeamWatchersHandler(object):
     """Handler object of counting team watchers for a repository (for multi-threading)."""
     def __init__(self):
-        self.counter = 0  # counter of threads working now to produce this result (NOT the number of workers)
+        self.threads_counter = 0  # threads_counter of threads working now to produce this result (NOT the number of workers)
         self.ready = threading.Event()  # when the downloading finishes or an error happens
         self.exception = None
 
@@ -28,7 +28,7 @@ class TeamWatchersCalculatorWorkerPool(multiprocessing.pool.ThreadPool):
         """Run our aggregation from multiple GH/BB teams in parallel and return the result in `data['total']`.
 
         `handler` is a `TeamWatchersHandler`."""
-        handler.counter += 1  # do not return until it is zero again
+        handler.threads_counter += 1  # do not return until it is zero again
         logging.debug("Launching the thread for repo %s", url)
         self.apply_async(TeamWatchersCalculatorWorkerPool.process_one, (self, handler, data, url))
 
@@ -44,7 +44,7 @@ class TeamWatchersCalculatorWorkerPool(multiprocessing.pool.ThreadPool):
         with self.lock:  # avoid race conditions
             if handler.exception is not None:  # no need to keep working
                 logging.debug("Got an exception in thread for %s", url)
-                # We could decrease the handler.counter here, but it is not necessary
+                # We could decrease the handler.threads_counter here, but it is not necessary
                 return
 
         logging.debug("GET %s" % url)
@@ -52,14 +52,14 @@ class TeamWatchersCalculatorWorkerPool(multiprocessing.pool.ThreadPool):
             watchers_response = requests.get(url)
             with self.lock:  # avoid race conditions
                 data['watchers'] += watchers_response.json()['size']
-                handler.counter -= 1  # this thread is ready
-                if not handler.counter:
+                handler.threads_counter -= 1  # this thread is ready
+                if not handler.threads_counter:
                     handler.ready.set()  # Notify that we have finished with this result object.
                     logging.debug("Finished all threads for a BitBucket repo watchers info downloading")
         except Exception as ex:
             with self.lock:
                 handler.exception = ex
-                # handler.counter is nonzero indicating an error
+                # handler.threads_counter is nonzero indicating an error
                 handler.ready.set()  # we should finish the work, as there is an error
                 logging.debug("Exception %s in BitBucket repo watchers info downloading" % str(ex))
                 # There is no way to terminate AsyncResult, just wait when it completes :-(
