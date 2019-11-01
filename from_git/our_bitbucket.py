@@ -73,8 +73,9 @@ class TeamNotFound(object):
 def list_team_repos(team, fields):
     """Yields repository data for each team's repository. Or return `None` if no such team."""
 
-    # Request 100 repositories per page, and the next page URL
-    next_page_url = 'https://api.bitbucket.org/2.0/repositories/%s?pagelen=100&fields=next,%s' % (team, fields)
+    # Request N repositories per page, and the next page URL
+    next_page_url = 'https://api.bitbucket.org/2.0/repositories/%s?pagelen=%d&fields=next,%s' % \
+                    (team, settings.BITBUCKET_REPOS_PER_PAGE, fields)
 
     # Keep fetching pages while there's a page to fetch
     while next_page_url is not None:

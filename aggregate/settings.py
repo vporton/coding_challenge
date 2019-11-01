@@ -122,6 +122,9 @@ USE_TZ = True
 
 STATIC_URL = '/static/'
 
+# How much to download in one request, not recommended to be changed
+BITBUCKET_REPOS_PER_PAGE = 100
+
 # Threads for the main processing pool an for downloading BitBucket watchers info
 NUM_THREADS_MAIN = 3
 NUM_THREADS_BITBUCKET_WATCHERS = 3
