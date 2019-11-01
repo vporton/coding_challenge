@@ -1,11 +1,17 @@
 #!/usr/bin/env python
 """Django's command-line utility for administrative tasks."""
-import os
+import logging
+
+import env_file
 import sys
+
+from django.conf import settings
 
 
 def main():
-    os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'aggregate.settings')
+    # os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'aggregate.settings')
+    env_file.load()
+    logging.basicConfig(level=settings.LOG_LEVEL)
     try:
         from django.core.management import execute_from_command_line
     except ImportError as exc:

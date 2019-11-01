@@ -9,7 +9,7 @@ https://docs.djangoproject.com/en/2.2/topics/settings/
 For the full list of settings and their values, see
 https://docs.djangoproject.com/en/2.2/ref/settings/
 """
-
+import logging
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
@@ -129,4 +129,4 @@ BITBUCKET_REPOS_PER_PAGE = 100
 NUM_THREADS_MAIN = 3
 NUM_THREADS_BITBUCKET_WATCHERS = 3
 
-from local_settings import *
+LOG_LEVEL = logging.DEBUG

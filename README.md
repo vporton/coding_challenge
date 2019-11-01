@@ -23,6 +23,11 @@ You must create the file `local_settings.py` in the
 project folder containing your GitHub API token like:
 ```python
 GITHUB_API_TOKEN = 'XXX'
+# Consider also changing LOG_LEVEL (see `logging` module).
+```
+and the file `.env` in the same folder with content
+```
+DJANGO_SETTINGS_MODULE = local_settings
 ```
 
 You can create this token using "Developer settings" /

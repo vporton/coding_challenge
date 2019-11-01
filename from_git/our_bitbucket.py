@@ -29,6 +29,7 @@ class TeamWatchersCalculatorWorkerPool(multiprocessing.pool.ThreadPool):
 
         `handler` is a `TeamWatchersHandler`."""
         handler.counter += 1  # do not return until it is zero again
+        logging.debug("Launching the thread for repo %s", url)
         self.apply_async(TeamWatchersCalculatorWorkerPool.process_one, (self, handler, data, url))
 
     @staticmethod
@@ -42,6 +43,7 @@ class TeamWatchersCalculatorWorkerPool(multiprocessing.pool.ThreadPool):
         Increases `data['total']`."""
         with self.lock:  # avoid race conditions
             if handler.exception is not None:  # no need to keep working
+                logging.debug("Got an exception in thread for %s", url)
                 # We could decrease the handler.counter here, but it is not necessary
                 return
 
@@ -53,11 +55,13 @@ class TeamWatchersCalculatorWorkerPool(multiprocessing.pool.ThreadPool):
                 handler.counter -= 1  # this thread is ready
                 if not handler.counter:
                     handler.ready.set()  # Notify that we have finished with this result object.
+                    logging.debug("Finished all threads for a BitBucket repo watchers info downloading")
         except Exception as ex:
             with self.lock:
                 handler.exception = ex
                 # handler.counter is nonzero indicating an error
                 handler.ready.set()  # we should finish the work, as there is an error
+                logging.debug("Exception %s in BitBucket repo watchers info downloading" % str(ex))
                 # There is no way to terminate AsyncResult, just wait when it completes :-(
 
 
@@ -125,6 +129,7 @@ def process_repository(total, repo, watchers_handler):
 
 def download_team(url):
     """Return aggregated team data (see `common.py`) or `None` if no such team."""
+    logging.debug("Starting downloading the team %s" % url)
     team = url.replace('https://bitbucket.org/', '', 1)
     result = deepcopy(zero_data)  # still zero repos processed
 

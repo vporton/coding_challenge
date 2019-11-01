@@ -95,6 +95,7 @@ def get_repositories_for_org(client, org):
 
 def download_organization(url):
     """Return aggregated organization data (see `common.py`) or `None` if no such org."""
+    logging.debug("Starting downloading the organization %s" % url)
     result = deepcopy(zero_data)  # still zero repos processed
     org = url.replace('https://github.com/', '', 1)
     client = GraphQLClient('https://api.github.com/graphql')
