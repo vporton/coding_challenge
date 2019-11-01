@@ -71,7 +71,7 @@ python manage.py test
 ```
 curl -i "http://127.0.0.1:8000/health-check?url=https://github.com/mailchimp&url=https://bitucket.org/mailchimp"
 ```
-(You can provide any number of GitHub and BitButcket URLs in the request. `github.com` and `bitbucket.org` must be in small letters.)
+(You can provide any number of GitHub and BitButcket URLs in the request. `github.com` and `bitbucket.org` must be in lowercase.)
 
 Alternatively you can enter one URL at a line in the
 form at `http://127.0.0.1:8000/from-git/test`.
