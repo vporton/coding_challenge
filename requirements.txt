@@ -1,4 +1,4 @@
-Django==2.2.6
+Django==5.0.14
 env_file==2019.4.13
 djangorestframework==3.9.3
 requests==2.22.0
